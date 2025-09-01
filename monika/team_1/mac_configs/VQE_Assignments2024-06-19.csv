@@ -1,0 +1,35 @@
+Tester,Device & Model,OS Language,CCD Language,Keyboard Input Layout,Network,User License,Install Method,Install Location,User Directory Location,OS Theme,Resolution,Monitors,Input Device,branch-beta-stable
+1,"(PR ARM6)Macbook  Air, Apple M1, Apple M1, M1, Processor Details 8 GB, macOS Monterey 12.7.3(21H1015), Computer MonitorSSD 251 GB",zh-CN,English,English,Offline,CCI,Clean Install as Admin,Default,Default,Dark,FHD,HDR,Mouse,main stable
+
+2,"(PR M5)Macbook Pro, Intel i9, 2.3 GHz 8-core Intel Core i9, AMD Radeon Pro 5500M 4GB Intel UHD Graphics 630 1536 MB, Processor Details 16 GB,macOS Ventura 13.2.1, Computer MonitorSSD 1 TB",es-ES,Simplified Chinese (简体中文),English,WIFI,CCI,Clean Install as Admin,Default,Default,Dark,4k(USB C),HDR,Mouse,ASAN
+
+3,"(PR M3)Macbook Pro, Intel i7, 2.2 GHz Quad-Core Intel Core i7, Intel Iris Pro 1536 MB, Processor Details16 GB, macOS monterey V12.3.1 Computer MonitorSSD 251 GB",Egypt (fallback to en-US),Español,English,WIFI,CCI,Clean Install as Admin,Default,Default,Dark,4k(HDMI),SDR,Mouse,main stable
+
+4,"(PR ARM1)Macbook M1  Pro, Apple M1, Apple M1, Processor Details8 GB,macOS Ventura 13.6.4(22G513), Computer MonitorSSD 251 GB",tr-TR (fallback to en-US),Deutsch,English,Offline,CCI,Clean Install as Non-Admin,Default,Default,Light,4k(USB C),SDR,Mouse,main beta
+
+5,"(PR ARM7)Macbook M1  Pro, Apple M1, Apple M1, M1, Processor Details 8 GB, macOS Monterey 12.7.4(21H1123), Computer MonitorSSD 251 GB",es-ES,Japanese 日本語,English,Offline,CCI,Update as Non-Admin,Default,Default,High Contrast,4k(HDMI),HDR,Mouse,main beta
+
+6,"(PR ARM8)iMac,Apple M1, Apple M1, M1, Processor Details 8 GB, macOS Sonoma 14.1 Beta(23B5056e), Computer MonitorSSD 251GB",en-US,ko-KR 한국어,English,Offline,CCI,Clean Install as Non-Admin,Default,Default,Light,FHD,SDR,Mouse,ASAN
+
+7,"(PR ARM5)MiniMac, Apple M1, Apple M1, Metal 3, Processor Details8 GB,macOS Sonoma 14.5(23F79), Computer MonitorSSD 251 GB",Português (Brasil),English,English,Offline,CCI,Update as Admin,Default,Default,Dark,FHD,SDR,Mouse,ASAN
+
+8,"(PR ARM3)Macbook M1  Pro, Apple M1, Apple M1, M1, Processor Details16 GB, macOS Monterey12.7.3(21H1015), Computer MonitorSSD 251 GB",ja-JP,English,English,WIFI,CCI,Clean Install as Admin,Default,Default,High Contrast,4k(HDMI),HDR,Mouse,main stable
+
+9,"(PR M7)Macbook Pro, Intel i7, 2.2 GHz Quad-Core Intel Core i7, Intel Iris Pro 1536 MB, Processor Details 16 GB,macOS Monterey 12.3.1, Computer MonitorSSD 251 GB",en-US,Français,English,WIFI,CCI,Clean Install as Non-Admin,Default,Default,Dark,4k(HDMI),SDR,Mouse,main stable
+
+10,"(PR ARM2)Macbook M1  Air, Apple M1, Apple M1, M1, Processor Details16 GB, macOS Sonoma 14.3(23D56), Computer MonitorSSD 251 GB",it-IT,Japanese 日本語,English,Offline,CCI,Update as Non-Admin,Default,Default,High Contrast,4k(USB C),SDR,Mouse,main beta
+
+11,"(PR ARM4)Macbook M1  Air, Apple M1, Apple M1, M1, Processor Details8 GB, macOS Sonoma Version 14.3.1 (23D60), Computer MonitorSSD 251 GB",ja-JP,Deutsch,English,WIFI,CCI,Update as Admin,Default,Default,Light,FHD,HDR,Touch Screen/Trackpad,main stable
+
+12,"(PR M8)MacBook Pro, Intel i9, AMD Radeon Pro 5500M 4GB Intel UHD Graphics 630 1536 MB, Processor Details 16 GB, macOS Sonoma Version 14.4, Computer MonitorSSD 1 TB",ko-KR 한국어,English,English,WIFI,CCI,Clean Install as Non-Admin,Default,Default,High Contrast,4k(HDMI),HDR,Mouse,main stable
+
+13,"(PR M2)Macbook Pro, Intel i7, 2.6 GHz 6-Core Intel Core i7, AMD Radeon Pro 5300M 4GB Intel UHD Graphics 630 1536 MB, Processor Details16 GB,  macOS Ventura 13.2.1, Computer MonitorSSD 500 GB",de-DE,Português (Brasil),English,Offline,CCI,Update as Admin,Default,Default,High Contrast,4k(USB C),SDR,Mouse,main beta
+
+14,"(PR M1)Macbook Pro, Intel i7, 2.6 GHz Intel i7 6- Core, AMD Radeon Pro 5300M 4GB Intel UHD Graphics 630 1536 MB, Processor Details 16 GB, macOS Sonoma 14.5(23F79), Computer MonitorSSD 500 GB",ru-RU (fallback to en-US),Français,English,Offline,CCI,Update as Non-Admin,Default,Default,Light,FHD,SDR,Mouse,ASAN
+
+15,"(PR M6)Macbook Pro,Radeon Pro 555X 4 GB ,Intel i7,2.2.GHz 6-Core Intel Core i7, Processor Details 16GB, macOS Sonoma 14.5(23F79), Computer Monitor SSD 251 GB",fr-Fr,Español,English,WIFI,CCI,Clean Install as Admin,Default,Default,Light,FHD,SDR,Touch Screen/Trackpad,main beta
+
+16,"(PR ARM9Macbook M1  Air, Apple M1, Apple M1, M1, Processor Details16 GB, macOS Monterey 12.7.3(21H1015) , Computer MonitorSSD 251 GB",en-US,Simplified Chinese (简体中文),English,WIFI,CCI,Update as Non-Admin,Default,Default,Light,4k(HDMI),HDR,Touch Screen/Trackpad,main beta
+
+17,"(PR M4)Macbook Pro, Intel i9, 2.3 GHz 8-Core Intel Core i9, Radeon Pro 560X 4GB, Intel UHD Graphics 630 1536 MB, Processor Details32 GB, macOS Sonoma Version 14.0 Beta (23A5337a), Computer MonitorSSD 500 GB",en-US,Italiano,English,WIFI,CCI,Update as Admin,Default,Default,Dark,4k(USB C),HDR,Mouse,ASAN
+

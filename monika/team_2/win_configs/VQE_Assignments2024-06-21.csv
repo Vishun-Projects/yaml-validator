@@ -1,0 +1,9 @@
+Tester,Device & Model,CCD and OS Language,Keyboard Input Layout,Network,Install Method,Account Type,OS Theme,Resolution,DPI Scaling,Monitors,Input Device,Microphone,Device,Device Class,Sample Rate,Channel Layout,branch-beta-stable
+1,"(AU WS2) Windows Desktop, Windows 11 Pro Insider Beta, version 23H2, 11th Gen Intel(R) Core(TM) i7-11700K CPU @ 2.50GHz 2.50GHz, AMD Radeon RX 6600 XT (8 GB), 32 GB RAM, SSD 480 GB",Simplified Chinese (简体中文),English,WiFi,Update as Non-Admin,Adobe ID,Light,4K,150%,SDR,Mouse,USB Mic,Tangent,None,48000,Mono,main beta
+
+2,"(AU WS4) Windows Desktop, Windows 10 pro, version 22H2, 11th Gen Intel(R) Core(TM)i7-11700K CPU @ 3.60GHz NVIDIA  GeForce RTX 3050, 32 GB RAM, SSD 480 GB",Japanese 日本語,English,WiFi,Clean Install as Admin,Non-Adobe ID,Light,4K,100%,2 * SDR,Mouse,USB Headset,None,None,96000,Stereo,main beta
+
+3,"(AU WS1) Windows Desktop, Windows 11 Enterprise,version 22H2, 11th Gen Intel(R) Core(TM) i5-11400 CPU @ 2.60GHz 2.59 GHz, AMD Radeon RX 6600, 32 GB RAM, SSD 480 GB",English,English,Lan,Clean Install as Non-Admin,Non-Adobe ID,Light,4K,175%,SDR,Touch Screen Wacom,EXT Audio Interface,Motu,ASIO,48000,5.1,main beta
+
+4,"(AU Ws3) Windows Laptop, Windows 11 Pro, version 23H2, 11th Gen Intel(R) Core(TM) i9-11900H @ 2.50GHz, NVIDIA GeForce RTX 3060 laptop, 24 GB RAM, SSD 1 TB",English,English,Lan,Update as Admin,Adobe ID,Light,HD,200%,SDR,Mouse,USB Headset,FirePower FCA610,MME,44100,Mono,main beta
+

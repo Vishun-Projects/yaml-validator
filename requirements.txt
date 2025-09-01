@@ -1,0 +1,26 @@
+fastapi
+uvicorn
+pyyaml
+pandas
+openpyxl
+python-multipart
+psutil
+streamlit
+
+
+# core
+streamlit
+pandas
+pyyaml
+numpy
+
+# DB
+SQLAlchemy>=1.4
+pymysql
+
+# optional for PDF and plotting
+reportlab
+plotly
+matplotlib
+requests
+openpyxl

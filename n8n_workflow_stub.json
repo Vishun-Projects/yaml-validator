@@ -1,0 +1,37 @@
+{
+  "name": "Audit - Daily 11AM",
+  "nodes": [
+    {
+      "id": "cron",
+      "name": "Every day 11AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "parameters": { "mode": "everyDay", "hour": "11", "minute": "0", "timezone": "Asia/Kolkata" }
+    },
+    {
+      "id": "ssh_collect",
+      "name": "SSH - Collect Snapshot (example)",
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "parameters": { "command": "python /opt/collect_snapshot.py --json-out /tmp/snap.json" }
+    },
+    {
+      "id": "http",
+      "name": "Send to Validator API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "parameters": {
+  "url": "http://your-validator-host:8000/validate",
+        "options": { "bodyContentType": "multipart-form-data" }
+      }
+    },
+    {
+      "id": "email",
+      "name": "Email Results",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}

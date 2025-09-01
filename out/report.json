@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "total_fields": 4,
+    "mismatches": 0,
+    "mismatch_ratio": 0.0,
+    "likely_wrong_yaml": false
+  },
+  "fields": {
+    "device": {
+      "found_key": "device",
+      "value": "MyLaptop",
+      "status": "unknown",
+      "allowed": [],
+      "closest_match": "",
+      "similarity": 0.0
+    },
+    "oslanguage": {
+      "found_key": "os_language",
+      "value": "English",
+      "status": "unknown",
+      "allowed": [],
+      "closest_match": "",
+      "similarity": 0.0
+    },
+    "gpu": {
+      "found_key": "gpu",
+      "value": "Intel UHD Graphics",
+      "status": "unknown",
+      "allowed": [],
+      "closest_match": "",
+      "similarity": 0.0
+    },
+    "ram": {
+      "found_key": "ram",
+      "value": "8 GB",
+      "status": "unknown",
+      "allowed": [],
+      "closest_match": "",
+      "similarity": 0.0
+    }
+  }
+}

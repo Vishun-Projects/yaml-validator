@@ -1,0 +1,90 @@
+categories:
+# config options for Premiere Pro
+# choices are either a name, or [name, weight]; default weight is 1
+# indentation is required
+
+  - category: OS Language
+    choices:
+    - [en-US, 2]
+    - [ja-JP, 1]
+    - [es-ES, 1]
+    - [zh-CN, 1]
+    - [de-DE, 1]
+    - [fr-Fr, 1]
+    - Português (Brasil)
+    - [ko-KR 한국어,1]
+    - [it-IT, 1]
+    - tr-TR (fallback to en-US)
+    - ru-RU (fallback to en-US)
+    - Egypt (fallback to en-US)
+
+  - category: CCD Language
+    choices:
+    - [English, 4]
+    - [Japanese 日本語, 2]
+    - [Español, 2]
+    - [Simplified Chinese (简体中文), 2]
+    - [Deutsch, 2]
+    - [Français, 2]
+    - Português (Brasil)
+    - ko-KR 한국어
+    - Italiano
+    - tr-TR (fallback to en-US)
+    - ru-RU (fallback to en-US)
+    - Egypt (fallback to en-US)
+
+  - category: Keyboard Input Layout
+    choices:
+    - [English, 4]
+
+  - category: Network
+    choices:
+    - WIFI
+    - Offline
+
+  - category: User License
+    choices:
+    - CCI
+
+  - category: Install Method
+    choices:
+    - Clean Install as Admin
+    - Clean Install as Non-Admin
+    - Update as Admin
+    - Update as Non-Admin
+
+  - category: Install Location
+    choices:
+    - Default
+
+  - category: User Directory Location
+    choices:
+    - Default
+  - category: OS Theme
+    choices:
+    - Light
+    - Dark
+    - High Contrast
+  - category: Resolution
+    choices:
+    - [FHD, 3]
+    - [4k(HDMI), 3]
+    - [4k(USB C), 3]
+    
+  - category: Monitors
+    choices:    
+    - SDR
+    - HDR
+
+  - category: Input Device
+    choices:
+    - [Mouse, 4]
+    - [Touch Screen/Trackpad, 1]
+
+  - category: branch-beta-stable
+    choices:
+    - main beta
+    - main stable
+    - ASAN
+
+

@@ -1,0 +1,23 @@
+{
+  "caching": {
+    "enable_streamlit_cache": true,
+    "cache_ttl_seconds": 300,
+    "max_cache_size_mb": 100
+  },
+  "database": {
+    "connection_pool_size": 10,
+    "max_overflow": 20,
+    "pool_timeout": 30,
+    "pool_recycle": 3600
+  },
+  "ai_services": {
+    "request_timeout": 30,
+    "max_retries": 3,
+    "batch_size": 10
+  },
+  "ui": {
+    "lazy_loading": true,
+    "virtual_scrolling": true,
+    "debounce_delay_ms": 300
+  }
+}

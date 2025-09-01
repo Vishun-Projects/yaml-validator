@@ -1,0 +1,7 @@
+Tester,Device & Model,CCD and OS Language,Keyboard Input Layout,Network,Install Method,Account Type,OS Theme,Resolution,DPI Scaling,Monitors,Input Device,Microphone,Device,Device Class,Sample Rate,Channel Layout,branch-beta-stable
+1,"(AU MS1) Macbook Pro, Processor Apple M1, M1, 8GB RAM, Monterey 12.7.4, Computer HD 256 GB",English,English,Lan,Update as Admin,Non-Adobe ID,Light,4K,Default,SDR,Mouse,EXT Audio Interface,Scarlet 2i2,N/A,96000,Mono,main stable
+
+2,"(AU MS3) MacBook Pro, Processor Intel core i9, 2.3 GHz 8-Core, Graphics AMD Radeon Pro 5500M 4 GB  Intel UHD Graphics 630 1536 MB, Installed RAM 16 GB, MacOS Ventura 13.4.1(c), Hard Disk Macintosh SSD 1 TB",Japanese 日本語,English,WiFi,Clean Install as Non-Admin,Adobe ID,Light,4K,Default,SDR,Mouse,USB Mic,None,N/A,48000,5.1,main beta
+
+3,"(AU MS2) Macbook Pro, Processor Intel Core i9, 2.3 GHz 8-Core, Installed RAM 16GB, GPU Card-AMD Radeon Pro 5500M 4 GB Intel UHD Graphics 630 1536 MB, MacOS Sonoma 14.0 (Beta 6), Hard Disk Macintosh SSD 1TB",Simplified Chinese (简体中文),English,WiFi,Clean Install as Admin,Adobe ID,Light,HD,Default,SDR,Mouse,USB Headset,FaderPort,N/A,48000,Stereo,main beta
+

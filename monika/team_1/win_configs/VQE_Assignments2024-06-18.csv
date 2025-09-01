@@ -1,0 +1,19 @@
+Tester,Device & Model,OS Language,CCD Language,Keyboard Input Layout,Network,User License,Install Method,Install Location,User Directory Location,OS Theme,Resolution,DPI Scaling,Monitors,Input Device,branch-beta-stable
+1,"(PP W1) Windows Desktop, Windows 11 Pro, Intel i9, 11th Gen Intel (R) core (TM) i9-11900K @ 3.50GHz 3.50 GHz, AMD Radeon RX 6600, 16 GB RAM, SSD 480 GB",Português (Brasil),Japanese 日本語,English,LAN,CCI,Clean Install as Admin,Default,Default,Dark,QHD,125%,SDR,Mouse,main beta
+
+2,"(PP W2) Windows Desktop, Windows 11 Pro, Intel i5, Intel(R) Core(TM) i5-11400 @ 2.60GHz 2.59GHz, AMD Radeon RX 6600, 32 GB RAM, SSD 480 GB",fr-Fr,English,English,LAN,CCI,Clean Install as Admin,Default,Default,Light,4K,100%,2*SDR,Mouse,main stable
+
+3,"(PP W3) Windows Desktop, Windows 11 Pro, Intel i9, 11th Gen Intel(R) Core(TM) i9-11900K @ 3.50GHz, AMD Radeon RX 6900 XT, 64 GB RAM, SSD 480 GB",es-ES,Español,English,LAN,CCI,Update as Non-Admin,Default,Default,Light,FHD,100%,SDR,Mouse,main beta
+
+4,"(PP W5) Windows Desktop, Windows 10 Pro, Intel i7, Intel(R) Core(TM) i7-11700 @ 2.50GHz, NVIDIA GeForce GTX 1650, 64 GB RAM, SSD 480 GB",zh-CN,English,English,Offline,CCI,Update as Admin,Default,Default,Dark,FHD,150%,HDR,Mouse,main beta
+
+5,"(PP W6) Windows Desktop, Windows 11 Pro, Intel i7, Intel(R) Core(TM) i7-11th Gen Intel(R) Core(TM) 11700 2.50 GHz, AMD Radeon RX 6600(8GB), RAM 32 GB, SSD 480 GB",de-DE,Simplified Chinese (简体中文),English,Offline,CCI,Clean Install as Non-Admin,Default,Default,High Contrast,QHD,150%,HDR,Mouse,main beta
+
+6,"(PP W9) Windows Desktop, Windows 11 Pro, Intel i9, Intel(R) Core i9-11900 @ 2.50GHz, NVIDIA GeForce RTX 3080, 64 GB RAM, SSD 480 GB",en-US,Japanese 日本語,English,LAN,CCI,Clean Install as Admin,Default,Default,Light,4K,100%,HDR,Mouse,main stable
+
+7,"(PP W7) Windows Desktop, Windows 11 Pro, Intel Xeon, Intel(R) Xeon(R) CPU E-2246G CPU @ 3.60GHz, NVIDIA GeForce GTX 1660 SUPER, 16 GB RAM, SSD 480 GB",en-US,English,English,LAN,CCI,Clean Install as Non-Admin,Default,Default,Dark,4K,125%,2*SDR,Mouse,main stable
+
+8,"(PP W4) Windows Desktop, Windows 11 Pro, Intel i7, Intel(R) Core(TM) i7-11700K @ 3.60 GHz, NVIDIA GeForce GTX 1660 SUPER, 32 GB RAM, SSD 480 GB",ko-KR 한국어,English,English,Offline,CCI,Update as Admin,Default,Default,Light,QHD,150%,SDR,Mouse,main stable
+
+9,"(PP W8) Windows Desktop, Windows 11 Pro, AMD, AMD Ryzen 5 5600G with Radeon Graphics 3.90Hz, NVIDIA GeForce GTX 1650, 16 GB RAM, SSD 500 GB",ja-JP,Español,English,Offline,CCI,Update as Non-Admin,Default,Default,Dark,FHD,125%,2*SDR,Mouse,main beta
+

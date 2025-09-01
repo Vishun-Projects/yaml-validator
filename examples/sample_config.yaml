@@ -1,0 +1,15 @@
+# Example config: allowed values (your unchangeable YAML style)
+os_language:
+  - English
+  - German
+gpu:
+  - NVIDIA RTX 3060
+  - NVIDIA GTX 1660
+  - AMD RX 6800
+ram:
+  - 8 GB
+  - 16 GB
+  - 32 GB
+device:
+  - Workstation-01
+  - Laptop-45

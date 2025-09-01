@@ -1,0 +1,14 @@
+python .\win_generator.py 3 .\win_file.yaml .\win_name.yaml --date 2024-06-17 -v
+python .\mac_generator.py 3 .\mac_file.yaml .\mac_name.yaml --date 2024-06-17 -v
+
+
+*******Number 3 indicate how many file should be get has output it will won't generate the weekend file**********
+--date {2024-06-17} -----------------> you can specify your date has per you needed.
+
+this script will run into commandline and powershell.
+
+python .\win.py 5 .\win_file.yaml .\win_name.yaml --date 2024-06-17 -v
+
+install pip in cmd or powershell:
+pip3 install pyyaml
+pip3 install argparse

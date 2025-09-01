@@ -1,0 +1,102 @@
+categories:
+# config options for Premiere Pro
+# choices are either a name, or [name, weight]; default weight is 1
+# indentation is required
+# config options for Audition
+# choices are either a name, or [name, weight]; default weight is 1
+# indentation is required
+
+  - category: CCD and OS Language
+    choices:
+    - [English, 1]
+    - [Japanese 日本語, 1]
+    - [Simplified Chinese (简体中文), 1]
+    - [Deutsch, 1]
+    - [Français, 1]
+    - Português (Brasil)
+    - ko-KR 한국어
+    - Italiano
+    - Unsupported language (fallback to en-US)
+
+  - category: Keyboard Input Layout
+    choices:
+    - [English, 4]
+
+  - category: Network
+    choices:
+    - [WiFi, 2]
+    - [Lan, 4]
+    - [Offline, 2]
+
+  - category: Install Method
+    choices:
+    - Clean Install as Admin
+    - Clean Install as Non-Admin
+    - Update as Admin
+    - Update as Non-Admin
+
+  - category: Account Type
+    choices:
+    - Adobe ID 
+    - Non-Adobe ID
+
+  - category: OS Theme
+    choices:
+    - [Light, 4]
+    - [Dark, 4]
+    - High Contrast
+  - category: Resolution
+    choices:
+    - [4K, 2]
+    - [HD, 1]
+  - category: DPI Scaling
+    choices:
+    - Default
+    - Default
+    - Default
+
+  - category: Monitors
+    choices:
+    - [SDR, 3]
+    - 2 * SDR
+
+  - category: Input Device
+    choices:
+    - [Mouse, 3]
+    - [Touch Screen Wacom, 1]
+
+  - category: Microphone
+    choices:
+    - USB Headset
+    - USB Mic
+    - EXT Audio Interface
+
+  - category: Device
+    choices:
+    - [Scarlet 2i2, 1]
+    - [FaderPort, 1]
+    - [None, 1]
+
+  - category: Device Class
+    choices:
+    - [N/A, 3]
+
+  - category: Sample Rate
+    choices:
+    - 48000
+    - 96000
+    - 48000
+    - 44100
+
+  - category: Channel Layout
+    choices:
+    - Mono
+    - Stereo
+    - 5.1   
+
+  - category: branch-beta-stable
+    choices:
+    - main beta
+    - main stable
+
+

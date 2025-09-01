@@ -1,0 +1,19 @@
+names:
+    - (PR ARM1)Macbook M1  Pro, Apple M1, Apple M1, Processor Details8 GB,macOS Ventura 13.6.4(22G513), Computer MonitorSSD 251 GB
+    - (PR ARM2)Macbook M1  Air, Apple M1, Apple M1, M1, Processor Details16 GB, macOS Sonoma 14.3(23D56), Computer MonitorSSD 251 GB
+    - (PR ARM3)Macbook M1  Pro, Apple M1, Apple M1, M1, Processor Details16 GB, macOS Monterey12.7.3(21H1015), Computer MonitorSSD 251 GB
+    - (PR ARM4)Macbook M1  Air, Apple M1, Apple M1, M1, Processor Details8 GB, macOS Sonoma Version 14.3.1 (23D60), Computer MonitorSSD 251 GB
+    - (PR ARM5)MiniMac, Apple M1, Apple M1, Metal 3, Processor Details8 GB,macOS Sonoma 14.5(23F79), Computer MonitorSSD 251 GB
+    - (PR ARM6)Macbook  Air, Apple M1, Apple M1, M1, Processor Details 8 GB, macOS Monterey 12.7.3(21H1015), Computer MonitorSSD 251 GB
+    - (PR ARM7)Macbook M1  Pro, Apple M1, Apple M1, M1, Processor Details 8 GB, macOS Monterey 12.7.4(21H1123), Computer MonitorSSD 251 GB
+    - (PR ARM8)iMac,Apple M1, Apple M1, M1, Processor Details 8 GB, macOS Sonoma 14.1 Beta(23B5056e), Computer MonitorSSD 251GB
+    - (PR ARM9Macbook M1  Air, Apple M1, Apple M1, M1, Processor Details16 GB, macOS Monterey 12.7.3(21H1015) , Computer MonitorSSD 251 GB
+
+    - (PR M1)Macbook Pro, Intel i7, 2.6 GHz Intel i7 6- Core, AMD Radeon Pro 5300M 4GB Intel UHD Graphics 630 1536 MB, Processor Details 16 GB, macOS Sonoma 14.5(23F79), Computer MonitorSSD 500 GB
+    - (PR M2)Macbook Pro, Intel i7, 2.6 GHz 6-Core Intel Core i7, AMD Radeon Pro 5300M 4GB Intel UHD Graphics 630 1536 MB, Processor Details16 GB,  macOS Ventura 13.2.1, Computer MonitorSSD 500 GB
+    - (PR M3)Macbook Pro, Intel i7, 2.2 GHz Quad-Core Intel Core i7, Intel Iris Pro 1536 MB, Processor Details16 GB, macOS monterey V12.3.1 Computer MonitorSSD 251 GB
+    - (PR M4)Macbook Pro, Intel i9, 2.3 GHz 8-Core Intel Core i9, Radeon Pro 560X 4GB, Intel UHD Graphics 630 1536 MB, Processor Details32 GB, macOS Sonoma Version 14.0 Beta (23A5337a), Computer MonitorSSD 500 GB
+    - (PR M5)Macbook Pro, Intel i9, 2.3 GHz 8-core Intel Core i9, AMD Radeon Pro 5500M 4GB Intel UHD Graphics 630 1536 MB, Processor Details 16 GB,macOS Ventura 13.2.1, Computer MonitorSSD 1 TB
+    - (PR M6)Macbook Pro,Radeon Pro 555X 4 GB ,Intel i7,2.2.GHz 6-Core Intel Core i7, Processor Details 16GB, macOS Sonoma 14.5(23F79), Computer Monitor SSD 251 GB
+    - (PR M7)Macbook Pro, Intel i7, 2.2 GHz Quad-Core Intel Core i7, Intel Iris Pro 1536 MB, Processor Details 16 GB,macOS Monterey 12.3.1, Computer MonitorSSD 251 GB
+    - (PR M8)MacBook Pro, Intel i9, AMD Radeon Pro 5500M 4GB Intel UHD Graphics 630 1536 MB, Processor Details 16 GB, macOS Sonoma Version 14.4, Computer MonitorSSD 1 TB
