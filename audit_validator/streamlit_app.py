@@ -20,11 +20,15 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
-# Simple, clean CSS
+# Simple CSS for basic layout
 st.markdown(
     """
 <style>
-    /* Simple, clean design */
+    /* Basic layout styles */
+    .main-container {
+        padding: 20px;
+    }
+    
     .metric-box {
         background: #f8f9fa;
         border: 1px solid #dee2e6;
@@ -40,12 +44,22 @@ st.markdown(
     .status-low { background: #2ed573; color: white; padding: 4px 8px; border-radius: 4px; }
     .status-match { background: #3742fa; color: white; padding: 4px 8px; border-radius: 4px; }
     
-    .simple-card {
+    .card {
         background: white;
         border: 1px solid #dee2e6;
         border-radius: 8px;
         padding: 15px;
         margin: 10px 0;
+    }
+    
+    .chat-container {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        max-height: 300px;
+        overflow-y: auto;
     }
     
     .chat-message {
@@ -60,6 +74,32 @@ st.markdown(
         background: #e3f2fd;
         border-color: #2196f3;
     }
+    
+    .export-modal {
+        background: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+    }
+    
+    .export-modal-content {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 400px;
+    }
+    
+    /* Hide default Streamlit elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
 </style>
 """,
     unsafe_allow_html=True,
@@ -121,7 +161,7 @@ st.set_page_config(
     page_title="Audit Validator — Enterprise Dashboard",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
     menu_items={
         "Get Help": "https://github.com/your-repo/audit-validator",
         "Report a bug": "https://github.com/your-repo/audit-validator/issues",
@@ -148,6 +188,10 @@ if "current_tab" not in st.session_state:
     st.session_state.current_tab = "Executive"
 if "refresh_data" not in st.session_state:
     st.session_state.refresh_data = False
+if "show_export_modal" not in st.session_state:
+    st.session_state.show_export_modal = False
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 # ---------- Helpers / Utilities ----------
 
@@ -489,78 +533,423 @@ else:
     ai_audit_gui = _FakeAI()
 
 # ---------- UI: layout and components ----------
-# Simple sidebar
-with st.sidebar:
-    st.title("WP Yaml Validator")
-    st.caption("Configuration Validation Tool")
+# Two-pane layout matching the image structure
 
-    # User selection
-    users = get_users_cached() if db else get_users_cached()
-    user_emails = list(users.keys()) if users else ["admin@example.com", "owner@example.com", "auditor@example.com", "viewer@example.com"]
+# Add CSS for the layout
+st.markdown("""
+<style>
+    /* Hide default Streamlit elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {visibility: hidden;}
+    
+    /* Main container */
+    .main .block-container {
+        max-width: 100vw !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Two-pane layout */
+    .two-pane-container {
+        display: flex;
+        height: 100vh;
+        background: #f8f9fa;
+    }
+    
+    /* Left pane - narrower */
+    .left-pane {
+        width: 400px;
+        background: white;
+        padding: 30px;
+        border-right: 1px solid #e0e0e0;
+        overflow-y: auto;
+    }
+    
+    /* Right pane - wider */
+    .right-pane {
+        flex: 1;
+        background: white;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Upload sections */
+    .upload-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+        text-align: center;
+    }
+    
+    .upload-section:hover {
+        border-color: #ff6b35;
+        background: #fff5f2;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        background: #ff6b35 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 10px 20px !important;
+        font-weight: 600 !important;
+    }
+    
+    .stButton > button:hover {
+        background: #e55a2b !important;
+    }
+    
+    /* Chat container */
+    .chat-container {
+        flex: 1;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    
+    /* Chat input */
+    .chat-input-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 25px;
+        padding: 15px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: #f0f0f0 !important;
+        border-radius: 20px !important;
+        color: #666 !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #ff6b35 !important;
+        color: white !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-    if st.session_state.user_email:
-        st.success(f"Signed in as {st.session_state.user_email}")
-        if st.button("Sign Out"):
-            st.session_state.user_email = None
-            st.session_state.role = None
-            st.rerun()
-    else:
-        selected_user = st.selectbox("Select User", options=user_emails, index=0)
-        if st.button("Sign In"):
-            st.session_state.user_email = selected_user
-            st.session_state.role = users.get(selected_user, {}).get("role", "Viewer")
-            st.rerun()
+# Create the two-pane layout
+st.markdown('<div class="two-pane-container">', unsafe_allow_html=True)
 
-    st.divider()
+# LEFT PANE
+st.markdown('<div class="left-pane">', unsafe_allow_html=True)
 
-    # Logo upload (optional)
-    logo_file = st.file_uploader("Upload Logo (optional)", type=["png", "jpg", "jpeg"])
-    logo_path = None
-    if logo_file:
-        logo_path = os.path.join(os.path.dirname(__file__), "uploaded_logo.png")
-        with open(logo_path, "wb") as fh:
-            fh.write(logo_file.getvalue())
+# Header
+st.markdown('<h1 style="color: #ff6b35; font-size: 24px; font-weight: 700; margin-bottom: 5px;">Audit Validator</h1>', unsafe_allow_html=True)
+st.markdown('<p style="color: #666; font-size: 16px; margin-bottom: 30px;">Configuration Validation Tool</p>', unsafe_allow_html=True)
 
-    st.divider()
-    st.caption("Word Publishing - Yaml Validator")
+# Upload Logo Section
+st.markdown('<h3 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">Upload Logo</h3>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 14px; color: #666; margin-bottom: 15px;">Please upload file in jpeg or png format and make sure the file size is under 25 MB.</p>', unsafe_allow_html=True)
 
-# Main tabs
-tab_summary, tab_details, tab_ai, tab_downloads = st.tabs(
-    [
-        "📊 Executive",
-        "🔍 Details",
-        "🤖 AI Chat",
-        "⬇️ Exports",
-    ]
-)
+st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 24px; color: #666; margin-bottom: 10px;">☁️</div>', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 16px; color: #666; margin-bottom: 5px;">Drop file or browse</div>', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 12px; color: #999;">Format: .jpeg, .png & Max file size: 25 MB</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------- Run Validation action ----------
-with tab_summary:
-    st.header("Configuration Validation")
+logo_upload = st.file_uploader("", type=["jpeg", "jpg", "png"], key="logo_upload", label_visibility="collapsed")
 
-    # File upload section
     col1, col2 = st.columns([1, 1])
     with col1:
-        cfg_upload = st.file_uploader("Upload Config", type=["xlsx", "xls", "yaml", "yml"], key="cfg_main")
-    with col2:
-        snap_upload = st.file_uploader("Upload Snapshot", type=["json"], key="snap_main")
+    if st.button("Browse Files", key="browse_logo"):
+        pass
 
-    # Device ID and Run button
+# Upload Config Section
+st.markdown('<h3 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">Upload Config</h3>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 14px; color: #666; margin-bottom: 15px;">Please upload files in pdf, docx or doc format and make sure the file size is under 25 MB.</p>', unsafe_allow_html=True)
+
+st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 16px; color: #666; margin-bottom: 5px;">Drop file or Browse</div>', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 12px; color: #999;">Format: pdf, docx, doc & Max file size: 25 MB</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+cfg_upload = st.file_uploader("", type=["pdf", "docx", "doc", "xlsx", "xls", "yaml", "yml"], key="cfg_upload", label_visibility="collapsed")
+
     col3, col4 = st.columns([1, 1])
     with col3:
-        device_id_in = st.text_input("Device ID (optional)", value="", placeholder="device-123")
+    if st.button("Cancel", key="cancel_config"):
+        pass
     with col4:
-        run_now = st.button("Run Validation", type="primary")
-        if st.session_state.validation_result and st.button("Re-run"):
-            st.session_state.validation_result = None
-            st.rerun()
+    if st.button("Done", key="done_config"):
+        pass
 
+# Upload Snapshot Section
+st.markdown('<h3 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">Upload Snapshot</h3>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 14px; color: #666; margin-bottom: 15px;">Please upload files in pdf, docx or doc format and make sure the file size is under 25 MB.</p>', unsafe_allow_html=True)
+
+st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 16px; color: #666; margin-bottom: 5px;">Drop file or Browse</div>', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 12px; color: #999;">Format: pdf, docx, doc & Max file size: 25 MB</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+snap_upload = st.file_uploader("", type=["json"], key="snap_upload", label_visibility="collapsed")
+
+col5, col6 = st.columns([1, 1])
+with col5:
+    if st.button("Cancel", key="cancel_snap"):
+        pass
+with col6:
+    if st.button("Done", key="done_snap"):
+        pass
+
+# Run Validation Button
+st.markdown('<div style="margin-top: 30px;">', unsafe_allow_html=True)
+run_now = st.button("Run Validation", key="run_validation", type="primary")
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)  # End left pane
+
+# RIGHT PANE
+st.markdown('<div class="right-pane">', unsafe_allow_html=True)
+
+# Header with robot icon and tabs
+col7, col8, col9 = st.columns([1, 2, 1])
+with col7:
+    st.markdown('<div style="display: flex; align-items: center; gap: 10px;">', unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 20px; color: #20c997;">🤖</span>', unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 18px; font-weight: 600; color: #333;">Configure Validator</span>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col8:
+    tab1, tab2 = st.tabs(["Executive", "Details"])
+
+with col9:
+    if st.button("📤 Export", key="export_btn"):
+        st.session_state.show_export_modal = True
+
+# Main content area
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+st.markdown('<div style="font-size: 60px; color: #ddd; margin-bottom: 20px;">💬</div>', unsafe_allow_html=True)
+st.markdown('<h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 10px;">Smart AI Helper</h2>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 16px; color: #666; line-height: 1.5; max-width: 400px;">Always-on assistant offering instant answers, clear insights, and actionable recommendations.</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Chat input at bottom
+st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
+st.markdown('<span style="color: #666;">📎</span>', unsafe_allow_html=True)
+user_question = st.text_input("", placeholder="Message slothGPT...", key="chat_input", label_visibility="collapsed")
+if st.button("↑", key="send_chat"):
+    if user_question:
+        st.session_state.chat_history.append({"role": "user", "content": user_question})
+        # Generate AI response
+        if st.session_state.validation_result:
+            details = st.session_state.validation_result.get("details", []) or []
+            match_pct = st.session_state.validation_result.get("match_percentage", 0)
+            
+            context = f"""
+            Current validation results:
+            - Match Percentage: {match_pct}%
+            - Total Findings: {len(details)}
+            - Critical Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'critical')}
+            - High Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'high')}
+            - Medium Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'medium')}
+            - Low Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'low')}
+            
+            All findings: {chr(10).join([f"- {d.get('key')}: {d.get('explanation', '')}" for d in details])}
+            """
+            
+            prompt = f"""
+            You are an IT security expert helping analyze configuration validation results.
+            
+            {context}
+            
+            User question: {user_question}
+            
+            Provide a concise, helpful answer based on the validation results. Be specific and actionable.
+            """
+            
+            try:
+                response = ask_groq_cached(
+                    prompt,
+                    DEFAULT_MODELS[0],
+                    DEFAULT_GROQ_KEYS,
+                    system_prompt="You are an expert IT security analyst. Provide concise, actionable insights.",
+                    max_tokens=300,
+                    temperature=0.3,
+                    timeout=18,
+                )
+                st.session_state.chat_history.append({"role": "assistant", "content": response})
+    except Exception as e:
+                st.session_state.chat_history.append({"role": "assistant", "content": f"Sorry, I couldn't process that: {str(e)}"})
+    else:
+            st.session_state.chat_history.append({"role": "assistant", "content": "Please run a validation first to analyze results."})
+        st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)  # End right pane
+
+st.markdown('</div>', unsafe_allow_html=True)  # End two-pane container
+
+# Tab content (hidden but functional)
+with tab1:
+    # Executive Tab Content
+    result = st.session_state.get("validation_result")
+    if result:
+        st.markdown('<h3 style="margin-bottom: 20px; color: #333;">Executive Summary</h3>', unsafe_allow_html=True)
+        
+        match_pct = int(result.get("match_percentage", 0))
+        details = result.get("details", []) or []
+
+        # Simple metrics
+        col10, col11, col12, col13 = st.columns(4)
+        with col10:
+            st.metric("Match %", f"{match_pct}%")
+        with col11:
+            st.metric("Total Checks", len(details))
+        with col12:
+            critical_count = sum(1 for d in details if d.get("severity") and str(d.get("severity")).lower() == "critical")
+            st.metric("Critical", critical_count)
+        with col13:
+            statuses = get_statuses_cached() if db else {}
+            open_count = sum(1 for d in details if statuses.get(d.get("key")) != "resolved")
+            st.metric("Open Issues", open_count)
+
+        # Key findings table
+        st.markdown('<h4 style="margin: 20px 0 15px 0; color: #333;">Key Findings</h4>', unsafe_allow_html=True)
+        if details:
+            findings_data = []
+            for d in details[:5]:
+                explanation = d.get("explanation", "") or ""
+                findings_data.append(
+                    {
+                        "Key": d.get("key", ""),
+                        "Status": d.get("status", ""),
+                        "Severity": d.get("severity", ""),
+                        "Explanation": explanation[:50] + "..." if len(explanation) > 50 else explanation,
+                    }
+                )
+
+            df_findings = pd.DataFrame(findings_data)
+            st.dataframe(df_findings, use_container_width=True)
+        else:
+            st.info("No findings to display.")
+
+with tab2:
+    # Details Tab Content
+    result = st.session_state.get("validation_result")
+    if not result:
+        st.info("Run validation to see detailed results.")
+    else:
+        details = result.get("details", []) or []
+        match_pct = int(result.get("match_percentage", 0))
+
+        st.markdown('<h3 style="margin-bottom: 20px; color: #333;">Detailed Analysis</h3>', unsafe_allow_html=True)
+        
+        # Summary metrics
+        col14, col15, col16, col17 = st.columns(4)
+        with col14:
+            st.metric("Overall Match", f"{match_pct}%")
+        with col15:
+            critical_count = sum(1 for d in details if d.get("severity") and str(d.get("severity")).lower() == "critical")
+            st.metric("Critical", critical_count)
+        with col16:
+            high_count = sum(1 for d in details if d.get("severity") and str(d.get("severity")).lower() == "high")
+            st.metric("High", high_count)
+        with col17:
+            medium_count = sum(1 for d in details if d.get("severity") and str(d.get("severity")).lower() in ["medium", "partial"])
+            st.metric("Medium", medium_count)
+
+        # Charts section
+        if details and PLOTLY_AVAILABLE:
+            st.markdown('<h4 style="margin: 20px 0 15px 0; color: #333;">Severity Distribution</h4>', unsafe_allow_html=True)
+            
+            # Severity pie chart
+            severity_counts = {}
+            for d in details:
+                sev = str(d.get("severity", "")).lower()
+                if sev in ["critical", "high", "medium", "partial", "low", "match"]:
+                    if sev == "partial":
+                        sev = "medium"
+                    severity_counts[sev] = severity_counts.get(sev, 0) + 1
+            
+            if severity_counts:
+                fig = go.Figure(data=[go.Pie(
+                    labels=list(severity_counts.keys()),
+                    values=list(severity_counts.values()),
+                    hole=0.4,
+                    marker_colors=['#ff4757', '#ffa502', '#ffb142', '#2ed573', '#3742fa']
+                )])
+                fig.update_layout(
+                    height=300,
+                    showlegend=True,
+                    title="Distribution by Severity Level"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+        # Detailed findings table
+        st.markdown('<h4 style="margin: 20px 0 15px 0; color: #333;">All Findings</h4>', unsafe_allow_html=True)
+
+        # Filters
+        col18, col19 = st.columns([2, 1])
+        with col18:
+            search_term = st.text_input("Search findings", placeholder="Search by key or explanation...", key="search_details")
+        with col19:
+            severity_values = list({str(d.get("severity", "")).title() for d in details})
+            severity_filter = st.selectbox("Filter by severity", ["All"] + sorted(severity_values), key="severity_filter")
+
+        # Filter the data
+        filtered_details = details
+        if search_term:
+            filtered_details = [
+                d
+                for d in filtered_details
+                if search_term.lower() in str(d.get("key", "")).lower() or search_term.lower() in str(d.get("explanation", "")).lower()
+            ]
+        if severity_filter != "All":
+            filtered_details = [d for d in filtered_details if str(d.get("severity", "")).title() == severity_filter]
+
+        # Display results
+        if filtered_details:
+            st.info(f"Showing {len(filtered_details)} of {len(details)} findings")
+
+            display_data = []
+            for d in filtered_details[:10]:
+                explanation = d.get("explanation", "") or ""
+                display_data.append(
+                    {
+                        "Key": d.get("key", ""),
+                        "Status": d.get("status", ""),
+                        "Severity": d.get("severity", ""),
+                        "Explanation": explanation[:100] + "..." if len(explanation) > 100 else explanation,
+                        "First Seen": d.get("first_seen", "N/A")[:10] if d.get("first_seen") else "N/A",
+                    }
+                )
+
+            df_display = pd.DataFrame(display_data)
+            st.dataframe(df_display, use_container_width=True)
+        else:
+            st.info("No findings match the current filters.")
+
+# Run validation logic
 if run_now:
     # collect snapshot
     try:
         if snap_upload:
             snapshot = yaml.safe_load(snap_upload.getvalue())
-        else:
+    else:
             snapshot = ai_audit_gui.collect_full_snapshot(interactive_ui=False, collect_apps_flag=False)
     except Exception as e:
         st.error(f"Snapshot collection failed: {e}")
@@ -569,7 +958,7 @@ if run_now:
     # config
     if cfg_upload:
         config_yaml = read_uploaded_config_cached(cfg_upload.getvalue(), cfg_upload.name)
-    else:
+            else:
         # fallback: look for monika/ YAML
         possible = os.path.join(os.path.dirname(os.path.dirname(__file__)), "monika")
         if os.path.isdir(possible):
@@ -614,329 +1003,74 @@ if run_now:
                 invalidate_db_caches()
             except Exception:
                 pass  # Silently fail if DB initialization fails
-        st.success("Validation complete. View Executive & Details tabs.")
-
-# ---------- Executive Tab render ----------
-with tab_summary:
-    result = st.session_state.get("validation_result")
-    if not result:
-        st.info("Run validation to see results.")
-    else:
-        match_pct = int(result.get("match_percentage", 0))
-        details = result.get("details", []) or []
-
-        # Simple metrics
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Match %", f"{match_pct}%")
-        with col2:
-            st.metric("Total Checks", len(details))
-        with col3:
-            critical_count = sum(1 for d in details if d.get("severity") and str(d.get("severity")).lower() == "critical")
-            st.metric("Critical", critical_count)
-        with col4:
-            statuses = get_statuses_cached() if db else {}
-            open_count = sum(1 for d in details if statuses.get(d.get("key")) != "resolved")
-            st.metric("Open Issues", open_count)
-
-        st.markdown("---")
-        # Simple findings table
-        st.subheader("Key Findings")
-
-        if details:
-            # Create simple table
-            findings_data = []
-            for d in details[:10]:  # Show top 10
-                explanation = d.get("explanation", "") or ""
-                findings_data.append(
-                    {
-                        "Key": d.get("key", ""),
-                        "Status": d.get("status", ""),
-                        "Severity": d.get("severity", ""),
-                        "Explanation": explanation[:50] + "..." if len(explanation) > 50 else explanation,
-                    }
-                )
-
-            df_findings = pd.DataFrame(findings_data)
-            st.dataframe(df_findings, use_container_width=True)
-        else:
-            st.info("No findings to display.")
-
-        st.markdown("---")
-        # Enhanced heatmap section
-        st.markdown('<div class="main-header">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color: #2c3e50; margin: 0 0 15px 0;">🔥 Severity Heatmap</h3>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        cats = {}
-        for d in details:
-            key = d.get("key", "")
-            cat = key.split(".")[0] if "." in key else key
-            sev = d.get("severity", "unknown")
-            cats.setdefault(cat, []).append(sev)
-
-        heat = []
-        for cat, sevs in cats.items():
-            row = {
-                "category": cat,
-                "critical": sum(1 for s in sevs if str(s).lower() == "critical"),
-                "high": sum(1 for s in sevs if str(s).lower() == "high"),
-                "medium": sum(1 for s in sevs if str(s).lower() == "medium" or str(s).lower() == "partial"),
-                "low": sum(1 for s in sevs if str(s).lower() == "low" or str(s).lower() == "match"),
-            }
-            heat.append(row)
-
-        if heat:
-            df_heat = pd.DataFrame(heat).set_index("category")
-            if PLOTLY_AVAILABLE:
-                # Enhanced heatmap with better colors
-                fig = px.imshow(
-                    df_heat.fillna(0).T,
-                    labels=dict(x="Category", y="Severity", color="Count"),
-                    x=df_heat.index,
-                    y=df_heat.columns[::-1],
-                    color_continuous_scale="RdYlGn_r",
-                )
-                fig.update_layout(height=300, margin=dict(t=20, b=10, l=10, r=10), title="Issue Distribution by Category and Severity")
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.markdown('<div class="data-table">', unsafe_allow_html=True)
-                st.dataframe(df_heat, use_container_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-            st.markdown('<p style="text-align: center; color: #7f8c8d;">No categorical data available for heatmap</p>', unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------- DETAILS TAB ----------
-with tab_details:
-    result = st.session_state.get("validation_result")
-    if not result:
-        st.info("Run validation to see detailed results.")
-    else:
-        details = result.get("details", []) or []
-
-        st.subheader("Detailed Findings")
-
-        # Simple filters
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            search_term = st.text_input("Search", placeholder="Search findings...")
-        with col2:
-            severity_values = list({str(d.get("severity", "")).title() for d in details})
-            severity_filter = st.selectbox("Severity", ["All"] + sorted(severity_values))
-
-        # Filter the data
-        filtered_details = details
-        if search_term:
-            filtered_details = [
-                d
-                for d in filtered_details
-                if search_term.lower() in str(d.get("key", "")).lower() or search_term.lower() in str(d.get("explanation", "")).lower()
-            ]
-        if severity_filter != "All":
-            filtered_details = [d for d in filtered_details if str(d.get("severity", "")).title() == severity_filter]
-
-        # Display results
-        if filtered_details:
-            st.write(f"Showing {len(filtered_details)} of {len(details)} findings")
-
-            # Simple table
-            display_data = []
-            for d in filtered_details:
-                explanation = d.get("explanation", "") or ""
-                display_data.append(
-                    {
-                        "Key": d.get("key", ""),
-                        "Status": d.get("status", ""),
-                        "Severity": d.get("severity", ""),
-                        "Explanation": explanation[:100] + "..." if len(explanation) > 100 else explanation,
-                    }
-                )
-
-            df_display = pd.DataFrame(display_data)
-            st.dataframe(df_display, use_container_width=True)
-        else:
-            st.info("No findings match the current filters.")
-
-# ---------- AI INSIGHTS TAB ----------
-with tab_ai:
-    result = st.session_state.get("validation_result")
-    if not result:
-        st.info("Run validation to chat with AI about your results.")
-    else:
-        st.subheader("AI Chat Assistant")
-
-        # Initialize chat history
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
-
-        # Display chat history
-        st.write("**Chat History:**")
-        for i, message in enumerate(st.session_state.chat_history):
-            if message["role"] == "user":
-                st.markdown(f'<div class="chat-message user-message"><strong>You:</strong> {message["content"]}</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="chat-message"><strong>AI:</strong> {message["content"]}</div>', unsafe_allow_html=True)
-
-        # Generate initial summary if not done
-        if not st.session_state.chat_history:
-            with st.spinner("Analyzing your results..."):
-                try:
-                    details = result.get("details", []) or []
-                    match_pct = result.get("match_percentage", 0)
-
-                    context = f"""
-                    Validation Results Analysis:
-                    - Overall Match Percentage: {match_pct}%
-                    - Total Findings: {len(details)}
-                    - Critical Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'critical')}
-                    - High Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'high')}
-                    - Medium Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'medium')}
-                    - Low Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'low')}
-                    
-                    Key findings details:
-                    {chr(10).join([f"- {d.get('key')}: {d.get('explanation', '')}" for d in details[:5]])}
-                    """
-
-                    prompt = f"""
-                    You are an IT security and compliance expert. Provide a comprehensive analysis of these configuration validation results.
-                    
-                    {context}
-                    
-                    Please provide:
-                    1. **Executive Summary** (2-3 sentences on overall status)
-                    2. **Risk Assessment** (Low/Medium/High based on findings)
-                    3. **Top 3 Priority Issues** that need attention
-                    4. **Compliance Impact** (if any regulatory concerns)
-                    5. **Recommended Next Steps** (3-5 actionable items)
-                    
-                    Be detailed, professional, and provide specific insights that would be valuable for both technical and executive audiences.
-                    """
-
-                    response = ask_groq_cached(
-                        prompt,
-                        DEFAULT_MODELS[0],
-                        DEFAULT_GROQ_KEYS,
-                        system_prompt="You are an expert IT security analyst. Provide detailed, actionable insights.",
-                        max_tokens=500,
-                        temperature=0.3,
-                        timeout=18,
-                    )
-
-                    ai_response = response
-                    st.session_state.chat_history.append({"role": "assistant", "content": ai_response})
-
-                except Exception as e:
-                    st.error(f"AI analysis failed: {e}")
-                    st.session_state.chat_history.append({"role": "assistant", "content": "I'm here to help analyze your validation results. What would you like to know about your findings?"})
-
-        # Chat input
-        st.write("**Ask a Question:**")
-        user_question = st.text_input("", placeholder="e.g., What are the most critical issues? How can I improve compliance?")
-
-        if user_question and st.button("Send Question"):
-            st.session_state.chat_history.append({"role": "user", "content": user_question})
-
-            with st.spinner("Analyzing..."):
-                try:
-                    details = result.get("details", []) or []
-                    match_pct = result.get("match_percentage", 0)
-
-                    context = f"""
-                    Current validation results:
-                    - Match Percentage: {match_pct}%
-                    - Total Findings: {len(details)}
-                    - Critical Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'critical')}
-                    - High Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'high')}
-                    - Medium Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'medium')}
-                    - Low Issues: {sum(1 for d in details if str(d.get('severity','')).lower() == 'low')}
-                    
-                    All findings: {chr(10).join([f"- {d.get('key')}: {d.get('explanation', '')}" for d in details])}
-                    """
-
-                    prompt = f"""
-                    You are an IT security expert helping analyze configuration validation results.
-                    
-                    {context}
-                    
-                    User question: {user_question}
-                    
-                    Provide a detailed, helpful answer based on the validation results. Be specific, actionable, and professional. 
-                    If the question is about specific issues, provide detailed explanations and recommendations.
-                    If it's about compliance, explain the regulatory implications.
-                    If it's about remediation, provide step-by-step guidance.
-                    """
-
-                    response = ask_groq_cached(
-                        prompt,
-                        DEFAULT_MODELS[0],
-                        DEFAULT_GROQ_KEYS,
-                        system_prompt="You are an expert IT security analyst. Provide detailed, actionable insights.",
-                        max_tokens=400,
-                        temperature=0.3,
-                        timeout=18,
-                    )
-
-                    ai_response = response
-                    st.session_state.chat_history.append({"role": "assistant", "content": ai_response})
+        
+        st.success("Validation complete!")
                     st.rerun()
 
-                except Exception as e:
-                    st.error(f"Sorry, I couldn't process that question: {e}")
-
-        # Clear chat button
-        if st.button("Clear Chat History"):
-            st.session_state.chat_history = []
-            st.rerun()
-
-# ---------- DOWNLOADS / EXPORTS TAB ----------
-with tab_downloads:
-    st.markdown('<div class="main-header">', unsafe_allow_html=True)
-    st.markdown('<h2 style="color: #2c3e50; margin: 0 0 15px 0;">⬇️ Exports & Reports</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #7f8c8d; margin: 0;">Generate and download comprehensive reports in various formats</p>', unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+# ---------- Export Modal ----------
+if st.session_state.show_export_modal:
+    st.markdown('<div class="export-modal">', unsafe_allow_html=True)
+    st.markdown('<div class="export-modal-content">', unsafe_allow_html=True)
+    
+    st.subheader("Export Options")
 
     result = st.session_state.get("validation_result")
     if not result:
-        st.markdown('<div class="main-header">', unsafe_allow_html=True)
-        st.markdown('<div style="text-align: center; padding: 40px;">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color: #7f8c8d; margin: 0;">📊 Export & Reports</h3>', unsafe_allow_html=True)
-        st.markdown('<p style="color: #95a5a6; margin: 10px 0;">Run validation to enable report generation and exports</p>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.warning("No validation results to export. Please run validation first.")
+        if st.button("Close", key="close_modal"):
+            st.session_state.show_export_modal = False
+            st.rerun()
     else:
-        # Export options in cards
-        col1, col2 = st.columns([1, 1])
-
+        # Export options
+        export_type = st.selectbox(
+            "Select export type:",
+            ["JSON Report", "CSV Findings", "Executive PDF"],
+            key="export_type"
+        )
+        
+        include_ai = st.checkbox("Include AI insights", value=True)
+        
+        col1, col2 = st.columns(2)
         with col1:
-            st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-            st.markdown('<h4 style="margin: 0 0 15px 0; color: #2c3e50;">📄 Data Exports</h4>', unsafe_allow_html=True)
-
-            # JSON export
+            if st.button("Download", key="download_export"):
+                if export_type == "JSON Report":
             json_bytes = json.dumps(result, indent=2).encode("utf-8")
-            st.download_button("📋 Download Validation (JSON)", data=json_bytes, file_name="validation_report.json", mime="application/json", use_container_width=True)
-
-            # CSV export
+                    st.download_button(
+                        "Download JSON",
+                        data=json_bytes,
+                        file_name="validation_report.json",
+                        mime="application/json",
+                        key="json_download"
+                    )
+                elif export_type == "CSV Findings":
             details_df = pd.DataFrame(result.get("details", []))
             if not details_df.empty:
                 csv_bytes = details_df.to_csv(index=False).encode("utf-8")
-                st.download_button("📊 Download Findings (CSV)", data=csv_bytes, file_name="findings.csv", mime="text/csv", use_container_width=True)
-
-            st.markdown("</div>", unsafe_allow_html=True)
+                        st.download_button(
+                            "Download CSV",
+                            data=csv_bytes,
+                            file_name="findings.csv",
+                            mime="text/csv",
+                            key="csv_download"
+                        )
+                elif export_type == "Executive PDF":
+                    ai_txt = st.session_state.get("groq_last_response", "")
+                    pdf_bytes, mime, fname = build_exec_pdf_bytes(result, ai_reply_text=ai_txt, include_ai=include_ai)
+                    st.download_button(
+                        "Download PDF",
+                        data=pdf_bytes,
+                        file_name=fname,
+                        mime=mime,
+                        key="pdf_download"
+                    )
 
         with col2:
-            st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-            st.markdown('<h4 style="margin: 0 0 15px 0; color: #2c3e50;">📋 Executive Reports</h4>', unsafe_allow_html=True)
-
-            include_ai = st.checkbox("Include AI insights", value=True, help="Include AI-generated insights in the executive report")
-            ai_txt = st.session_state.get("groq_last_response", "")
-            pdf_bytes, mime, fname = build_exec_pdf_bytes(result, ai_reply_text=ai_txt, include_ai=include_ai, logo_path=logo_path)
-
-            st.download_button("📄 Download Executive Report", data=pdf_bytes, file_name=fname, mime=mime, use_container_width=True)
-
-            st.markdown('<p style="color: #7f8c8d; margin: 10px 0; font-size: 12px;">Format: PDF (or TXT if PDF generation unavailable)</p>', unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            if st.button("Cancel", key="cancel_export"):
+                st.session_state.show_export_modal = False
+                st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------- Footer ----------
 st.divider()

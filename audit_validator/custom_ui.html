@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Validator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+
+            background: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            background: white;
+        }
+
+        /* LEFT PANE - Exactly 50% width */
+        .left-pane {
+            width: 50%;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* RIGHT PANE - Exactly 50% width */
+        .right-pane {
+            width: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LEFT PANE HEADER */
+        .left-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e9ecef;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .app-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff8c00;
+            margin-bottom: 5px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: normal;
+        }
+
+        /* TABS CONTAINER */
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+            background: white;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            background: white;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            border-bottom-color: #ff8c00;
+            color: #ff8c00;
+        }
+
+        .tab:not(.active):hover {
+            background: #f8f9fa;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        /* UPLOAD SECTIONS */
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .section-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .upload-box {
+            border: 2px dashed #8a2be2;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            background: white;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-box:hover {
+            border-color: #6a1b9a;
+            background: #f8f9fa;
+        }
+
+        .upload-box.orange {
+            border-color: #ff8c00;
+        }
+
+        .upload-box.orange:hover {
+            border-color: #e67e00;
+        }
+
+        .upload-box.uploaded {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .upload-box.uploaded .upload-icon {
+            color: #28a745;
+        }
+
+        .upload-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .upload-filename {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff8c00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 300px;
+        }
+
+        /* Tab Disabled State */
+        .tab.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Smooth Transitions */
+        .content-area {
+            transition: all 0.3s ease;
+        }
+
+        .tab {
+            transition: all 0.2s ease;
+        }
+
+        .tab:hover:not(.disabled) {
+            transform: translateY(-1px);
+        }
+
+        /* Typing Indicator */
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            color: #8a2be2;
+            margin-bottom: 10px;
+        }
+
+        .upload-box.orange .upload-icon {
+            color: #ff8c00;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .upload-text .highlight {
+            color: #8a2be2;
+        }
+
+        .upload-box.orange .upload-text .highlight {
+            color: #ff8c00;
+        }
+
+        .upload-format {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* BUTTONS */
+        .button {
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .button-primary {
+            background: #485568;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #242b34;
+        }
+
+        .button-secondary {
+            background: white;
+            color: #333;
+            border: 1px solid #ced4da;
+        }
+
+        .button-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .run-validation {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* RIGHT PANE HEADER */
+        .right-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .robot-icon {
+            font-size: 20px;
+            color: #20c997;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .export-button {
+            background: #ff8c00;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .export-button:hover {
+            background: #e67e00;
+        }
+
+        /* CHAT CONTAINER */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: calc(100vh - 300px); /* Ensure it doesn't overflow */
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .chat-message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-bubble.user {
+            background: #ff8c00;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bubble.bot {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+            line-height: 1.6;
+        }
+
+        .message-bubble.bot strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .message-bubble.bot br {
+            margin-bottom: 8px;
+        }
+
+        .message-bubble.bot .message-content {
+            text-align: left;
+        }
+
+        .message-bubble.bot ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .message-bubble.bot li {
+            margin-bottom: 6px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+        }
+
+        .chat-icon {
+            font-size: 80px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .chat-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .chat-description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+            max-width: 400px;
+        }
+
+        /* CHAT INPUT */
+        .chat-input-container {
+            padding: 20px 25px;
+            border-top: 1px solid #e9ecef;
+            background: white;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 12px 20px;
+            gap: 10px;
+            transition: border-color 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: #ff8c00;
+            box-shadow: 0 2px 12px rgba(255, 140, 0, 0.2);
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+            color: #333;
+        }
+
+        .chat-input::placeholder {
+            color: #adb5bd;
+            font-style: italic;
+        }
+
+        .chat-input:focus {
+            color: #2c3e50;
+        }
+
+        .chat-icons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6c757d;
+        }
+
+        .send-button {
+            background: #ff8c00;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+        }
+
+        .send-button:hover {
+            background: #e67e00;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4);
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        /* DETAILS TAB CONTENT */
+        .details-content {
+            display: none;
+        }
+
+        .details-content.active {
+            display: block;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .chart-container {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .findings-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+        }
+
+        .findings-table th,
+        .findings-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .findings-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .severity-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .severity-critical { background: #ff4757; color: white; }
+        .severity-high { background: #ffa502; color: white; }
+        .severity-medium { background: #ffb142; color: white; }
+        .severity-low { background: #2ed573; color: white; }
+
+        /* EXPORT MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            min-width: 400px;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .export-options {
+            margin-bottom: 20px;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .export-option:hover {
+            background: #f8f9fa;
+        }
+
+        .export-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .export-option label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* FILE INPUT HIDDEN */
+        .file-input {
+            display: none;
+        }
+
+        /* Weightage system removed - focusing on detailed match results */
+        
+        /* Match type styling */
+        .match-type-exact {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .match-type-partial {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .match-type-mismatch {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Upload config message styling */
+        #upload-config-message {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #dee2e6;
+            text-align: center;
+        }
+
+        #upload-config-message .section-title {
+            color: #6c757d;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #upload-config-message .section-description {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        /* ENHANCED RESPONSIVE DESIGN */
+        @media (max-width: 1200px) {
+            .preferences-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-pane {
+                width: 100%;
+                height: auto;
+                min-height: 60vh;
+            }
+            
+            .right-pane {
+                width: 100%;
+                height: auto;
+                min-height: 40vh;
+            }
+
+            .preferences-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .findings-table {
+                font-size: 12px;
+            }
+
+            .findings-table th,
+            .findings-table td {
+                padding: 8px 10px;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .modal-content {
+                min-width: 300px;
+                margin: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .preferences-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .findings-table {
+                font-size: 11px;
+            }
+
+            .findings-table th,
+            .findings-table td {
+                padding: 6px 8px;
+            }
+
+            .left-header,
+            .right-header {
+                padding: 15px 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+        }
+
+        /* TABLE RESPONSIVENESS */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .findings-table {
+            min-width: 600px;
+        }
+
+        .findings-table th,
+        .findings-table td {
+            white-space: nowrap;
+        }
+
+        .findings-table td:last-child {
+            white-space: normal;
+            max-width: 200px;
+        }
+    </style>
+</head>
+<body >
+    <div class="main-container">
+        <!-- LEFT PANE -->
+        <div class="left-pane">
+            <!-- Header -->
+            <div class="left-header">
+                <div class="app-title">Audit Validator</div>
+                <div class="app-subtitle">Configuration Validation Tool</div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab active" onclick="switchTab('executive')">Executive</button>
+                <button class="tab" onclick="switchTab('details')">Details</button>
+            </div>
+
+            <!-- Executive Tab Content -->
+            <div class="content-area" id="executive-content">
+                <!-- Upload Logo Section -->
+                <div class="upload-section">
+                    <div class="section-title">Upload Logo</div>
+                    <div class="section-description">Please upload file in jpeg or png format and make sure the file size is under 25 MB.</div>
+                    
+                    <div class="upload-box" id="logo-upload-box" onclick="document.getElementById('logo-input').click()">
+                        <div class="upload-icon">☁️</div>
+                        <div class="upload-text">Drop file or <span class="highlight">browse</span></div>
+                        <div class="upload-format">Format: .jpeg, .png & Max file size: 25 MB</div>
+                        <div class="upload-filename" id="logo-filename" style="display: none;"></div>
+                    </div>
+                    <input type="file" id="logo-input" class="file-input" accept=".jpg,.jpeg,.png" onchange="handleLogoUpload(this)">
+                    
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="button button-primary" onclick="document.getElementById('logo-input').click()">Browse Files</button>
+                    </div>
+                </div>
+
+                <!-- Upload Config Section -->
+                <div class="upload-section">
+                    <div class="section-title">Upload Config</div>
+                    <div class="section-description">Please upload files in pdf, docx or doc format and make sure the file size is under 25 MB.</div>
+                    
+                    <div class="upload-box orange" id="config-upload-box" onclick="document.getElementById('config-input').click()">
+                        <div class="upload-icon">☁️</div>
+                        <div class="upload-text">Drop file or <span class="highlight">Browse</span></div>
+                        <div class="upload-format">Format: pdf, docx, doc & Max file size: 25 MB</div>
+                        <div class="upload-filename" id="config-filename" style="display: none;"></div>
+                    </div>
+                    <input type="file" id="config-input" class="file-input" accept=".pdf,.docx,.doc,.xlsx,.xls,.yaml,.yml" onchange="handleConfigUpload(this)">
+                    
+                    <div class="button-group">
+                        <button class="button button-secondary" onclick="clearFile('config-input')">Cancel</button>
+                        <button class="button button-primary" onclick="document.getElementById('config-input').click()">Done</button>
+                    </div>
+                </div>
+
+                <!-- Upload Snapshot Section -->
+                <!-- <div class="upload-section">
+                    <div class="section-title">Upload Snapshot</div>
+                    <div class="section-description">Please upload files in json format and make sure the file size is under 25 MB.</div>
+                    
+                    <div class="upload-box orange" id="snapshot-upload-box" onclick="document.getElementById('snapshot-input').click()">
+                        <div class="upload-icon">☁️</div>
+                        <div class="upload-text">Drop file or <span class="highlight">Browse</span></div>
+                        <div class="upload-format">Format: json & Max file size: 25 MB</div>
+                        <div class="upload-filename" id="snapshot-filename" style="display: none;"></div>
+                    </div>
+                    <input type="file" id="snapshot-input" class="file-input" accept=".json" onchange="handleSnapshotUpload(this)">
+                    
+                    <div class="button-group">
+                        <button class="button button-secondary" onclick="clearFile('snapshot-input')">Cancel</button>
+                        <button class="button button-primary" onclick="document.getElementById('snapshot-input').click()">Done</button>
+                    </div>
+                </div> -->
+
+                <!-- Removed weightage system - direct validation focus -->
+
+                <!-- Run Validation Button -->
+                <div style="margin-top: 20px; text-align: left;">
+                    <button 
+                        id="run-validation-btn"
+                        onclick="runValidation()"
+                        style="
+                            width: 201px;
+                            height: 48px;
+                            border-radius: 10px;
+                            padding: 12px 20px;
+                            gap: 8px;
+                            background: #F0A538;
+                            color: #fff;
+                            font-weight: 600;
+                            border: none;
+                            cursor: pointer;
+                            opacity: 1;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                            transition: all 0.2s ease;
+                        "
+                        onmouseover="this.style.background='#d68f28'"
+                        onmouseout="this.style.background='#F0A538'"
+                    >
+                        Run Validation
+                    </button>
+                
+                    <div id="validation-status" style="margin-top: 10px; text-align: center; display: none;">
+                        <div style="color: #28a745; font-weight: 600;">✓ Validation completed successfully!</div>
+                        <div style="color: #666; font-size: 14px;">Check the Details tab for results</div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- Details Tab Content -->
+            <div class="content-area details-content" id="details-content">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="match-percentage">73%</div>
+                        <div class="metric-label">Match Percentage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="total-findings">4</div>
+                        <div class="metric-label">Total Findings</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="critical-issues">1</div>
+                        <div class="metric-label">Critical Issues</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="high-issues">1</div>
+                        <div class="metric-label">High Issues</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="medium-issues">1</div>
+                        <div class="metric-label">Medium Issues</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="low-issues">1</div>
+                        <div class="metric-label">Low Issues</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Severity Distribution</div>
+                    <div style="height: 200px; position: relative;">
+                        <canvas id="severityChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Findings by Category</div>
+                    <div class="table-responsive">
+                        <table class="findings-table">
+                                                    <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Expected Value</th>
+                                <th>Actual Value</th>
+                                <th>Match Type</th>
+                                <th>Match Details</th>
+                            </tr>
+                        </thead>
+                            <tbody id="findings-table-body">
+                                <tr>
+                                    <td>Device & Model</td>
+                                    <td>Windows 11 Pro, Intel Xeon</td>
+                                    <td>Windows 10 Pro, Intel i7</td>
+                                    <td>75%</td>
+                                    <td><span class="severity-badge severity-medium">Partial</span></td>
+                                    <td>OS version mismatch, CPU different</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANE -->
+        <div class="right-pane">
+            <!-- Header -->
+            <div class="right-header">
+                <div class="header-left">
+                    <span class="robot-icon">🤖</span>
+                    <span class="header-title">Configure Validator</span>
+                </div>
+                <button class="export-button" onclick="showExportModal()">
+                    📤 Export
+                </button>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-placeholder">
+                        <div class="chat-icon">💬</div>
+                        <div class="chat-title">Smart AI Helper</div>
+                        <div class="chat-description">Always-on assistant offering instant answers, clear insights, and actionable recommendations.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <span class="chat-icons">📎</span>
+                    <input type="text" class="chat-input" placeholder="Message slothGPT..." id="chat-input">
+                    <button class="send-button" onclick="sendMessage()">↑</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Export Options</div>
+                <button class="close-button" onclick="closeExportModal()">×</button>
+            </div>
+            <div class="export-options">
+                <div class="export-option">
+                    <input type="radio" id="export-json" name="export-type" value="json" checked>
+                    <label for="export-json">JSON Report</label>
+                </div>
+                <div class="export-option">
+                    <input type="radio" id="export-csv" name="export-type" value="csv">
+                    <label for="export-csv">CSV Findings</label>
+                </div>
+                <div class="export-option">
+                    <input type="radio" id="export-pdf" name="export-type" value="pdf">
+                    <label for="export-pdf">Executive PDF</label>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="button button-secondary" onclick="closeExportModal()">Cancel</button>
+                <button class="button button-primary" onclick="exportData()">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Validating Configuration...</h3>
+            <p>Please wait while we analyze your files</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let uploadedFiles = {
+            logo: null,
+            config: null,
+            snapshot: null
+        };
+
+        let validationResult = null;
+        let chatHistory = [];
+
+                // Tab switching
+        function switchTab(tabName) {
+            // Check if Details tab should be disabled
+            if (tabName === 'details' && !validationResult) {
+                return; // Don't switch if no validation data
+            }
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Find the clicked tab and activate it
+            const tabs = document.querySelectorAll('.tab');
+            for (let tab of tabs) {
+                if (tab.textContent.toLowerCase() === tabName.toLowerCase()) {
+                    tab.classList.add('active');
+                    break;
+                }
+            }
+            
+            // Update content with smooth transition
+            if (tabName === 'executive') {
+                document.getElementById('executive-content').style.display = 'block';
+                document.getElementById('details-content').classList.remove('active');
+            } else if (tabName === 'details') {
+                document.getElementById('executive-content').style.display = 'none';
+                document.getElementById('details-content').classList.add('active');
+            }
+        }
+
+        // Update tab states based on validation status
+        function updateTabStates() {
+            const detailsTab = document.querySelector('.tab[onclick*="details"]');
+            if (validationResult) {
+                detailsTab.classList.remove('disabled');
+                detailsTab.style.cursor = 'pointer';
+            } else {
+                detailsTab.classList.add('disabled');
+                detailsTab.style.cursor = 'not-allowed';
+            }
+        }
+
+        // File handling
+        function clearFile(inputId) {
+            document.getElementById(inputId).value = '';
+            const fileType = inputId.replace('-input', '');
+            
+            // Remove from uploaded files tracking
+            if (window.uploadedFiles && window.uploadedFiles[fileType]) {
+                delete window.uploadedFiles[fileType];
+                console.log('Removed file from tracking:', fileType);
+                console.log('Updated uploaded files:', window.uploadedFiles);
+            }
+            
+            // Reset visual feedback
+            const uploadBox = document.getElementById(fileType + '-upload-box');
+            const filenameDiv = document.getElementById(fileType + '-filename');
+            
+            if (uploadBox) {
+                uploadBox.classList.remove('uploaded');
+                uploadBox.innerHTML = `
+                    <div class="upload-icon">☁️</div>
+                    <div class="upload-text">Drop file or <span class="highlight">${fileType === 'config' || fileType === 'run-validation-btn' ? 'Browse' : 'browse'}</span></div>
+                    <div class="upload-format">Format: ${getFormatText(fileType)} & Max file size: 25 MB</div>
+                    <div class="upload-filename" id="${fileType}-filename" style="display: none;"></div>
+                `;
+            }
+            
+            // Weightage system removed - focusing on detailed match results
+        }
+
+        function getFormatText(fileType) {
+            switch(fileType) {
+                case 'logo': return '.jpeg, .png';
+                case 'config': return 'pdf, docx, doc';
+                case 'snapshot': return 'json';
+                default: return 'all files';
+            }
+        }
+
+        async function uploadFile(file, type) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', type);
+
+            try {
+                console.log(`Uploading ${type} file:`, file.name);
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('Upload response:', result);
+                
+                if (result.success) {
+                    // Track uploaded files for AI context
+                    if (!window.uploadedFiles) {
+                        window.uploadedFiles = {};
+                    }
+                    window.uploadedFiles[type] = result.filename;
+                    console.log(`${type} file uploaded successfully:`, result.filename);
+                    console.log('Updated uploaded files:', window.uploadedFiles);
+                    
+                    // Store Excel columns if available
+                    if (type === 'config' && result.columns) {
+                        window.uploadedExcelColumns = result.columns;
+                        console.log('✅ Excel columns received:', result.columns);
+                        console.log('📊 Number of columns:', result.columns.length);
+                    } else {
+                        console.log('❌ No columns received in result:', result);
+                        console.log('🔍 Result keys:', Object.keys(result));
+                    }
+                    
+                    // Show visual feedback
+                    showUploadSuccess(type, result.filename);
+                    
+                    // Weightage system removed - focusing on detailed match results
+                } else {
+                    console.error('Upload failed:', result.error);
+                    alert(`Upload failed: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert(`Upload error: ${error.message}`);
+            }
+        }
+
+        function showUploadSuccess(type, filename) {
+            const uploadBox = document.getElementById(type + '-upload-box');
+            const filenameDiv = document.getElementById(type + '-filename');
+            
+            if (uploadBox) {
+                // Add uploaded class for styling
+                uploadBox.classList.add('uploaded');
+                
+                // Update content to show success
+                uploadBox.innerHTML = `
+                    <div class="upload-status">✓ Uploaded</div>
+                    <div class="upload-icon">✅</div>
+                    <div class="upload-text">File uploaded successfully!</div>
+                    <div class="upload-filename">${filename}</div>
+                `;
+            }
+        }
+
+        function handleLogoUpload(input) {
+            if (input.files[0]) {
+                uploadFile(input.files[0], 'logo');
+            }
+        }
+
+        function handleConfigUpload(input) {
+            if (input.files[0]) {
+                uploadFile(input.files[0], 'config');
+            }
+        }
+
+        function handleSnapshotUpload(input) {
+            if (input.files[0]) {
+                uploadFile(input.files[0], 'snapshot');
+            }
+        }
+
+        // Chat functionality - Enhanced with context checking
+
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="message-bubble bot">
+                    <div class="typing-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function addChatMessage(message, sender) {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // Remove placeholder if it exists
+            const placeholder = chatMessages.querySelector('.chat-placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            // Add message to chat history
+            chatHistory.push({
+                message: message,
+                sender: sender,
+                timestamp: new Date()
+            });
+            
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            
+            if (sender === 'ai') {
+                // Format AI response for better readability
+                const formattedMessage = formatAIResponse(message);
+                messageDiv.innerHTML = `
+                    <div class="message-bubble ${sender}">
+                        ${formattedMessage}
+                        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                `;
+            } else {
+                // Simple user message
+                messageDiv.innerHTML = `
+                    <div class="message-bubble ${sender}">
+                        ${message}
+                        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Format AI response for better readability
+        function formatAIResponse(message) {
+            // Check if message contains validation results or analysis
+            if (message.includes('validation results') || message.includes('findings') || message.includes('match percentage')) {
+                return formatValidationAnalysis(message);
+            }
+            
+            // Check if message contains recommendations or next steps
+            if (message.includes('recommendations') || message.includes('next steps') || message.includes('actions')) {
+                return formatRecommendations(message);
+            }
+            
+            // Default formatting for other messages
+            return formatGeneralMessage(message);
+        }
+
+        // Check if user has current session files before allowing analysis
+        function hasCurrentSessionFiles() {
+            console.log('🔍 Checking for files...');
+            console.log('📁 Window uploadedFiles:', window.uploadedFiles);
+            
+            // Check if any file inputs have files
+            const configInput = document.getElementById('config-input');
+            const logoInput = document.getElementById('logo-input');
+            
+            const hasConfig = configInput && configInput.files && configInput.files.length > 0;
+            const hasLogo = logoInput && logoInput.files && logoInput.files.length > 0;
+            
+            console.log('📋 Has config input files:', hasConfig);
+            console.log('🖼️ Has logo input files:', hasLogo);
+            
+            // Also check if we have files in our tracking system
+            const hasTrackedFiles = window.uploadedFiles && Object.keys(window.uploadedFiles).length > 0;
+            console.log('📊 Has tracked files:', hasTrackedFiles);
+            
+            // Return true if either input has files OR we have tracked files
+            const hasFiles = hasConfig || hasLogo || hasTrackedFiles;
+            
+            console.log('✅ Final result - Has files:', hasFiles);
+            
+            return hasFiles;
+        }
+
+        // Enhanced chat function with context checking
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Check if user has files before allowing analysis questions
+            if (!hasCurrentSessionFiles() && (
+                message.toLowerCase().includes('analysis') ||
+                message.toLowerCase().includes('findings') ||
+                message.toLowerCase().includes('validation') ||
+                message.toLowerCase().includes('results') ||
+                message.toLowerCase().includes('match') ||
+                message.toLowerCase().includes('percentage')
+            )) {
+                addChatMessage('Please upload a configuration file first before I can provide analysis. I need to see your actual data to give you meaningful insights.', 'ai');
+                input.value = '';
+                return;
+            }
+            
+            // Add user message
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                const hasFiles = hasCurrentSessionFiles();
+                console.log('Sending chat request with hasFiles:', hasFiles);
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        message: message,
+                        hasFiles: hasFiles
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('Chat response:', result);
+                
+                if (result.response) {
+                    addChatMessage(result.response, 'ai');
+                } else if (result.error) {
+                    addChatMessage(`Error: ${result.error}`, 'ai');
+                } else {
+                    addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+                }
+            } catch (error) {
+                console.error('Chat error:', error);
+                addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+            }
+            
+            hideTypingIndicator();
+        }
+
+        // Format validation analysis messages
+        function formatValidationAnalysis(message) {
+            let formatted = message;
+            
+            // Replace long paragraphs with structured sections
+            formatted = formatted.replace(/(\d+\.\s+\*\*[^*]+\*\*:)/g, '<br><br><strong>$1</strong>');
+            formatted = formatted.replace(/(\*\*[^*]+\*\*:)/g, '<br><strong>$1</strong>');
+            formatted = formatted.replace(/(\d+\.\s+)/g, '<br>• ');
+            formatted = formatted.replace(/(\*\*[^*]+\*\*)/g, '<strong>$1</strong>');
+            
+            // Add section breaks
+            formatted = formatted.replace(/(To proceed|To address|Next steps|Recommendations):/gi, '<br><br><strong>$1:</strong>');
+            
+            // Handle specific validation result formatting
+            formatted = formatted.replace(/(Based on the validation results, I've identified the following key findings:)/g, '<strong>$1</strong><br><br>');
+            formatted = formatted.replace(/(Overall Status:)/g, '<br><strong>$1</strong>');
+            formatted = formatted.replace(/(Key Findings:)/g, '<br><strong>$1</strong>');
+            formatted = formatted.replace(/(Recommendations:)/g, '<br><strong>$1</strong>');
+            formatted = formatted.replace(/(Next Steps:)/g, '<br><strong>$1</strong>');
+            
+            // Format bullet points better
+            formatted = formatted.replace(/(\d+\.\s+)([^:]+):\s+([^\.]+\.)/g, '<br>• <strong>$2:</strong> $3');
+            
+            // Handle the specific long paragraph case you mentioned
+            formatted = formatted.replace(/(Based on the validation results, here's a concise summary of your current findings:)/g, '<strong>$1</strong><br><br>');
+            
+            // Break up long sentences with bullet points
+            formatted = formatted.replace(/(\*\*[^*]+\*\*:)\s+([^\.]+\.)/g, '<br><strong>$1</strong><br>$2');
+            
+            // Format specific findings
+            formatted = formatted.replace(/(\*\*Device & Model\*\*:)/g, '<br><strong>$1</strong>');
+            formatted = formatted.replace(/(\*\*Medium Issue\*\*:)/g, '<br><strong>$1</strong>');
+            formatted = formatted.replace(/(\*\*Low Issues\*\*:)/g, '<br><strong>$1</strong>');
+            
+            return formatted;
+        }
+
+        // Format recommendation messages
+        function formatRecommendations(message) {
+            let formatted = message;
+            
+            // Structure recommendations
+            formatted = formatted.replace(/(\d+\.\s+)/g, '<br>• ');
+            formatted = formatted.replace(/(\*\*[^*]+\*\*)/g, '<strong>$1</strong>');
+            formatted = formatted.replace(/(\*\*[^*]+\*\*:)/g, '<br><strong>$1</strong>');
+            
+            return formatted;
+        }
+
+        // Format general messages
+        function formatGeneralMessage(message) {
+            let formatted = message;
+            
+            // Basic formatting
+            formatted = formatted.replace(/(\*\*[^*]+\*\*)/g, '<strong>$1</strong>');
+            formatted = formatted.replace(/(\d+\.\s+)/g, '<br>• ');
+            
+            return formatted;
+        }
+
+        // Export modal
+        function showExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('active');
+        }
+
+        async function exportData() {
+            const exportType = document.querySelector('input[name="export-type"]:checked').value;
+            
+            try {
+                const response = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ format: exportType })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Create download link
+                    const blob = new Blob([result.data], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = result.filename;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    closeExportModal();
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+            }
+        }
+
+        // Enhanced validation function is now defined above
+
+        function showLoadingOverlay() {
+            document.getElementById('loading-overlay').classList.add('show');
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loading-overlay').classList.remove('show');
+        }
+
+        function updateDetailsTab(result) {
+            console.log('Updating details tab with result:', result);
+            
+            // Helper function for safe element updates
+            const updateMetric = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.warn(`Element with id '${id}' not found`);
+                }
+            };
+            
+            // Update metrics with error handling
+            updateMetric('match-percentage', result.match_percentage + '%');
+            updateMetric('total-findings', result.details.length);
+            
+            const criticalCount = result.details.filter(d => d.severity === 'critical').length;
+            const highCount = result.details.filter(d => d.severity === 'high').length;
+            const mediumCount = result.details.filter(d => d.severity === 'medium').length;
+            const lowCount = result.details.filter(d => d.severity === 'low').length;
+            
+            updateMetric('critical-issues', criticalCount);
+            updateMetric('high-issues', highCount);
+            updateMetric('medium-issues', mediumCount);
+            updateMetric('low-issues', lowCount);
+
+            // Create severity distribution chart
+            createSeverityChart(criticalCount, highCount, mediumCount, lowCount);
+
+            // Update findings table
+            const tbody = document.getElementById('findings-table-body');
+            tbody.innerHTML = '';
+            
+            result.details.forEach(detail => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${detail.key}</td>
+                    <td><span class="severity-badge severity-${detail.severity}">${detail.severity}</span></td>
+                    <td>${detail.status}</td>
+                    <td>${detail.explanation}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            console.log('Details tab updated successfully');
+        }
+
+        function createSeverityChart(critical, high, medium, low) {
+            const ctx = document.getElementById('severityChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.severityChartInstance) {
+                window.severityChartInstance.destroy();
+            }
+            
+            const data = [
+                { label: 'Critical', value: critical, color: '#dc3545' },
+                { label: 'High', value: high, color: '#fd7e14' },
+                { label: 'Medium', value: medium, color: '#ffc107' },
+                { label: 'Low', value: low, color: '#28a745' }
+            ].filter(item => item.value > 0); // Only show categories with values
+            
+            if (data.length === 0) {
+                // Show empty state
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No severity data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            window.severityChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        data: data.map(item => item.value),
+                        backgroundColor: data.map(item => item.color),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Enter key for chat
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Drag and drop
+        document.querySelectorAll('.upload-box').forEach(box => {
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.style.borderColor = box.classList.contains('orange') ? '#e67e00' : '#6a1b9a';
+            });
+            
+            box.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                box.style.borderColor = box.classList.contains('orange') ? '#ff8c00' : '#8a2be2';
+            });
+            
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.style.borderColor = box.classList.contains('orange') ? '#ff8c00' : '#8a2be2';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const inputId = box.parentElement.querySelector('.file-input').id;
+                    const type = inputId.replace('-input', '');
+                    uploadFile(file, type);
+                }
+            });
+        });
+
+        // Weightage system removed - focusing on detailed match results
+
+        // Enhanced validation function
+        async function runValidation() {
+            console.log('Starting enhanced validation...');
+            console.log('Window uploadedFiles:', window.uploadedFiles);
+            
+            if (!hasCurrentSessionFiles()) {
+                alert('Please upload a config file first.');
+                return;
+            }
+
+            // Show loading overlay
+            showLoadingOverlay();
+
+            try {
+                // If snapshot is uploaded, use it; otherwise auto-generate
+                const snapshotType = window.uploadedFiles && window.uploadedFiles.snapshot ? 'manual' : 'auto';
+                console.log('Snapshot type:', snapshotType);
+                
+                const requestBody = { 
+                    snapshot_type: snapshotType
+                };
+                console.log('Enhanced validation request:', requestBody);
+                
+                const response = await fetch('/api/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                console.log('Validation response status:', response.status);
+                const result = await response.json();
+                console.log('Enhanced validation result:', result);
+                
+                if (result.success) {
+                    validationResult = result.result;
+                    updateDetailsTab(validationResult);
+                    
+                    // Show validation success status
+                    document.getElementById('validation-status').style.display = 'block';
+                    document.getElementById('run-validation-btn').style.display = 'none';
+                    
+                    // Update tab states
+                    updateTabStates();
+                    
+                    // Hide loading and switch to details tab with smooth transition
+                    setTimeout(() => {
+                        hideLoadingOverlay();
+                        switchTab('details');
+                    }, 500);
+                } else {
+                    hideLoadingOverlay();
+                    alert('Validation failed: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Validation error:', error);
+                hideLoadingOverlay();
+                alert('Validation failed. Please try again. Error: ' + error.message);
+            }
+        }
+
+        // Enhanced details tab update
+        function updateDetailsTab(result) {
+            console.log('Updating details tab with enhanced result:', result);
+            
+            // Helper function for safe element updates
+            const updateMetric = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.warn(`Element with id '${id}' not found`);
+                }
+            };
+            
+            // Update metrics with error handling
+            updateMetric('match-percentage', result.match_percentage + '%');
+            updateMetric('total-findings', result.details.length);
+            
+            const criticalCount = result.details.filter(d => d.severity === 'critical').length;
+            const highCount = result.details.filter(d => d.severity === 'high').length;
+            const mediumCount = result.details.filter(d => d.severity === 'medium').length;
+            const lowCount = result.details.filter(d => d.severity === 'low').length;
+            
+            updateMetric('critical-issues', criticalCount);
+            updateMetric('high-issues', highCount);
+            updateMetric('medium-issues', mediumCount);
+            updateMetric('low-issues', lowCount);
+
+            // Create severity distribution chart
+            createSeverityChart(criticalCount, highCount, mediumCount, lowCount);
+
+            // Update findings table with enhanced information
+            const tbody = document.getElementById('findings-table-body');
+            tbody.innerHTML = '';
+            
+            result.details.forEach(detail => {
+                const row = document.createElement('tr');
+                
+                // Truncate long values for display
+                const truncate = (text, maxLength = 30) => {
+                    if (!text) return 'N/A';
+                    const str = Array.isArray(text) ? text.join(', ') : String(text);
+                    return str.length > maxLength ? str.substring(0, maxLength) + '...' : str;
+                };
+                
+                // Determine match type and styling
+                let matchType = detail.status;
+                let matchClass = 'match-type-' + detail.status;
+                
+                if (detail.status === 'match') {
+                    matchType = '✅ Exact Match';
+                    matchClass = 'match-type-exact';
+                } else if (detail.status === 'partial') {
+                    matchType = '⚠️ Partial Match';
+                    matchClass = 'match-type-partial';
+                } else if (detail.status === 'mismatch') {
+                    matchType = '❌ No Match';
+                    matchClass = 'match-type-mismatch';
+                }
+                
+                row.innerHTML = `
+                    <td><strong>${detail.key}</strong></td>
+                    <td title="${Array.isArray(detail.expected) ? detail.expected.join(', ') : detail.expected}">${truncate(detail.expected)}</td>
+                    <td title="${Array.isArray(detail.actual) ? detail.actual.join(', ') : detail.actual}">${truncate(detail.actual)}</td>
+                    <td><span class="${matchClass}">${matchType}</span></td>
+                    <td title="${detail.explanation}">${truncate(detail.explanation, 60)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            console.log('Enhanced details tab updated successfully');
+        }
+
+        // Weightage system removed - focusing on detailed match results
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial tab
+            switchTab('executive');
+            
+            // Initialize tab states
+            updateTabStates();
+            
+            // Initialize uploadFiles tracking
+            window.uploadedFiles = {};
+            
+            // Add debug button for troubleshooting
+            addDebugButton();
+        });
+
+        
+
+        // Debug function to show current file status
+        function debugFileStatus() {
+            console.log('🔍 === DEBUG FILE STATUS ===');
+            console.log('📁 Window uploadedFiles:', window.uploadedFiles);
+            
+            const configInput = document.getElementById('config-input');
+            const logoInput = document.getElementById('logo-input');
+            
+            console.log('📋 Config input files:', configInput?.files);
+            console.log('🖼️ Logo input files:', logoInput?.files);
+            
+            const hasFiles = hasCurrentSessionFiles();
+            console.log('✅ Final hasCurrentSessionFiles result:', hasFiles);
+            console.log('🔍 === END DEBUG ===');
+        }
+
+        // Test function to verify file detection
+        function testFileDetection() {
+            console.log('🧪 === TESTING FILE DETECTION ===');
+            
+            // Test the hasCurrentSessionFiles function
+            const result = hasCurrentSessionFiles();
+            console.log('🧪 hasCurrentSessionFiles() result:', result);
+            
+            // Test what would happen in runValidation
+            if (!result) {
+                console.log('❌ File check would FAIL - validation would be blocked');
+            } else {
+                console.log('✅ File check would PASS - validation would proceed');
+            }
+            
+            // Show alert with result
+            if (result) {
+                alert('✅ File detection test PASSED! You can run validation.');
+            } else {
+                alert('❌ File detection test FAILED! Check console for details.');
+            }
+            
+            console.log('🧪 === END TEST ===');
+        }
+    </script>
+</body>
+</html>
