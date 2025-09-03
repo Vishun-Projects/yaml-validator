@@ -14,26 +14,26 @@
 
         body {
             font-family: "Plus Jakarta Sans", sans-serif;
-
             background: #f8f9fa;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .main-container {
             display: flex;
-            height: 100vh;
-            background: white;
+            min-height: 100vh;
+            background: transparent;
         }
 
         /* LEFT PANE - Exactly 50% width */
         .left-pane {
             width: 50%;
-            background: white;
+            background: #f9fafb;
             border-right: 1px solid #e9ecef;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            max-height: 100vh;
         }
 
         /* RIGHT PANE - Exactly 50% width */
@@ -42,57 +42,64 @@
             background: white;
             display: flex;
             flex-direction: column;
+            max-height: 100vh;
         }
 
         /* LEFT PANE HEADER */
         .left-header {
             padding: 20px 25px;
             border-bottom: 1px solid #e9ecef;
-            height: 80px;
+            min-height: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .app-title {
             font-size: 28px;
             font-weight: bold;
-            color: #ff8c00;
+            color: #F0A538;
             margin-bottom: 5px;
         }
 
         .app-subtitle {
             font-size: 14px;
-            color: #6c757d;
+            color: #2F6F6A;
             font-weight: normal;
         }
 
-        /* TABS CONTAINER */
-        .tabs-container {
+        .tabs-wrapper {
             display: flex;
-            border-bottom: 1px solid #e9ecef;
-            background: white;
+            justify-content: center;
+            margin: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .tabs-container {
+            display: inline-flex;
+            background: #f3f4f6;   /* light grey background */
+            border-radius: 12px;   /* pill shape */
+            padding: 4px;
         }
 
         .tab {
-            flex: 1;
-            padding: 15px 20px;
-            text-align: center;
-            background: white;
             border: none;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            font-size: 16px;
+            background: transparent;
+            padding: 8px 18px;
+            font-size: 14px;
             font-weight: 600;
-            color: #333;
-            transition: all 0.3s ease;
+            color: #6b7280;  /* grey text */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .tab.active {
-            border-bottom-color: #ff8c00;
-            color: #ff8c00;
+            background: #ffffff; /* active = white */
+            color: #111827;      /* dark text */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-
         .tab:not(.active):hover {
             background: #f8f9fa;
         }
@@ -102,12 +109,20 @@
             flex: 1;
             padding: 25px;
             overflow-y: auto;
+            min-height: 0;
         }
 
-        /* UPLOAD SECTIONS */
+        /* UPLOAD SECTIONS - Now as cards */
         .upload-section {
-            margin-bottom: 30px;
+            margin-bottom: 16px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #e9ecef;
+            flex-shrink: 0;
         }
+
 
         .section-title {
             font-size: 18px;
@@ -124,7 +139,7 @@
         }
 
         .upload-box {
-            border: 2px dashed #8a2be2;
+            border: 2px dashed #000000;
             border-radius: 8px;
             padding: 30px 20px;
             text-align: center;
@@ -136,16 +151,16 @@
         }
 
         .upload-box:hover {
-            border-color: #6a1b9a;
-            background: #f8f9fa;
+            border-color: #000000;
+            background: #f0f0f0;
         }
 
         .upload-box.orange {
-            border-color: #ff8c00;
+            border-color: #000000;
         }
 
         .upload-box.orange:hover {
-            border-color: #e67e00;
+            border-color: #000000;
         }
 
         .upload-box.uploaded {
@@ -349,13 +364,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 80px;
+            min-height: 80px;
+            flex-shrink: 0;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            margin-left: 20px; /* push in from left */
         }
 
         .robot-icon {
@@ -396,6 +412,7 @@
             border-radius: 8px;
             overflow: hidden;
             position: relative;
+            min-height: 0;
         }
 
         .chat-messages {
@@ -405,7 +422,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            max-height: calc(100vh - 300px); /* Ensure it doesn't overflow */
+            min-height: 0;
             scrollbar-width: thin;
             scrollbar-color: #cbd5e0 #f7fafc;
         }
@@ -536,6 +553,7 @@
             bottom: 0;
             z-index: 10;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
 
         .chat-input-wrapper {
@@ -615,6 +633,7 @@
             display: block;
         }
 
+        /* Metrics Grid */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -623,23 +642,31 @@
         }
 
         .metric-card {
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #dee2e6;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .metric-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .metric-label {
             font-size: 14px;
             color: #666;
+            font-weight: 500;
         }
 
         .chart-container {
@@ -658,6 +685,7 @@
         }
 
         .findings-table {
+            min-width: 800px;
             width: 100%;
             border-collapse: collapse;
             background: white;
@@ -671,12 +699,31 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .findings-table th {
             background: #f8f9fa;
             font-weight: 600;
             color: #333;
+        }
+
+        .findings-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .findings-table td:last-child {
+            white-space: normal;
+            max-width: 200px;
+        }
+
+        .findings-table td:nth-child(4),
+        .findings-table td:nth-child(5) {
+            max-width: 120px;
+            font-size: 12px;
         }
 
         .severity-badge {
@@ -830,18 +877,23 @@
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
+                min-height: auto;
             }
             
             .left-pane {
                 width: 100%;
                 height: auto;
-                min-height: 60vh;
+                min-height: auto;
+                background: none;
+                padding: 20px;
+                max-height: none;
             }
             
             .right-pane {
                 width: 100%;
                 height: auto;
-                min-height: 40vh;
+                min-height: auto;
+                max-height: none;
             }
 
             .preferences-grid {
@@ -869,6 +921,22 @@
                 min-width: 300px;
                 margin: 20px;
             }
+
+            .content-area {
+                padding: 15px;
+                min-height: auto;
+            }
+
+            .left-header,
+            .right-header {
+                padding: 15px 20px;
+                min-height: auto;
+            }
+
+            .upload-section {
+                margin-bottom: 12px;
+                padding: 10px 12px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -891,11 +959,25 @@
 
             .left-header,
             .right-header {
-                padding: 15px 20px;
+                padding: 12px 15px;
             }
 
             .content-area {
-                padding: 20px;
+                padding: 12px;
+            }
+
+            .upload-section {
+                padding: 8px 10px;
+                margin-bottom: 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .button-group .button {
+                width: 100%;
             }
         }
 
@@ -905,20 +987,378 @@
             -webkit-overflow-scrolling: touch;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 100%;
         }
 
         .findings-table {
             min-width: 600px;
+            width: 100%;
         }
 
         .findings-table th,
         .findings-table td {
             white-space: nowrap;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .findings-table td:last-child {
             white-space: normal;
-            max-width: 200px;
+            max-width: 250px;
+        }
+
+        @media (max-width: 768px) {
+            .findings-table {
+                min-width: 600px;
+                font-size: 12px;
+            }
+            
+            .findings-table th,
+            .findings-table td {
+                padding: 8px 10px;
+                max-width: 120px;
+            }
+
+            .findings-table td:nth-child(4),
+            .findings-table td:nth-child(5) {
+                max-width: 80px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .findings-table {
+                min-width: 500px;
+                font-size: 11px;
+            }
+            
+            .findings-table th,
+            .findings-table td {
+                padding: 6px 8px;
+                max-width: 100px;
+            }
+
+            .findings-table td:nth-child(4),
+            .findings-table td:nth-child(5) {
+                max-width: 70px;
+                font-size: 10px;
+            }
+        }
+        .bot-avatar {
+    width: 36px;      /* adjust size as needed */
+    height: 36px;
+    border-radius: 50%; /* makes it circular */
+    object-fit: cover;  /* keeps the image centered & cropped */
+    margin-right: 10px; /* space between avatar and title */
+}
+        .ai-bubble{
+            width:220px;
+            height:220px;
+            border-radius:14px;
+            border:2px dashed #f1f1f1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#a0a0a0;
+            font-weight:800;
+            margin-bottom:18px;
+            font-size:48px;
+            background:#fff;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .legend-count {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+
+
+        /* Findings Section */
+        .findings-section {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .search-input {
+            padding: 10px 12px 10px 40px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 200px;
+            background: #f8f9fa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #007bff;
+            background: white;
+        }
+
+        .filter-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-button:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .filter-icon {
+            font-size: 14px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .status-match {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .status-partial {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            border-color: #ffc107;
+        }
+
+        .status-mismatch {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-color: #dc3545;
+        }
+
+        .severity-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .severity-critical {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+            color: white;
+            border-color: #c44569;
+        }
+
+        .severity-high {
+            background: linear-gradient(135deg, #ff6b7a 0%, #ff5252 100%);
+            color: white;
+            border-color: #e17055;
+        }
+
+        .severity-medium {
+            background: linear-gradient(135deg, #ffb142 0%, #ffa502 100%);
+            color: white;
+            border-color: #fdcb6e;
+        }
+
+        .severity-low {
+            background: linear-gradient(135deg, #2ed573 0%, #26de81 100%);
+            color: white;
+            border-color: #00b894;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .chart-content {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .chart-legend {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .legend-color.critical { background: #ff4757; }
+        .legend-color.high { background: #ff6b7a; }
+        .legend-color.medium { background: #ffb142; }
+        .legend-color.low { background: #2ed573; }
+
+        .legend-label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            min-width: 60px;
+        }
+
+        /* Filter Dropdown */
+        .filter-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 150px;
+            display: none;
+        }
+
+        .filter-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .filter-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .filter-option.active {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        /* Position filter button container */
+        .search-filter-container {
+            position: relative;
+        }
+
+        /* Device ID Header */
+        .device-id-header {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .device-id-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .device-id-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+            background: #e3f2fd;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid #bbdefb;
         }
     </style>
 </head>
@@ -931,12 +1371,20 @@
                 <div class="app-title">Audit Validator</div>
                 <div class="app-subtitle">Configuration Validation Tool</div>
             </div>
-
             <!-- Tabs -->
+            <div class="tabs-wrapper">
             <div class="tabs-container">
                 <button class="tab active" onclick="switchTab('executive')">Executive</button>
                 <button class="tab" onclick="switchTab('details')">Details</button>
+                </div>
+              </div>
+            <div class="header-left">
+                <img src="bot.jpg" alt="Bot Avatar" class="bot-avatar">
+                <span class="header-title">Configure Validator</span>
             </div>
+            
+              
+            
 
             <!-- Executive Tab Content -->
             <div class="content-area" id="executive-content">
@@ -953,7 +1401,8 @@
                     </div>
                     <input type="file" id="logo-input" class="file-input" accept=".jpg,.jpeg,.png" onchange="handleLogoUpload(this)">
                     
-                    <div style="text-align: center; margin-top: 15px;">
+                    <div class="button-group">
+                        <button class="button button-secondary" onclick="clearFile('logo-input')">Cancel</button>
                         <button class="button button-primary" onclick="document.getElementById('logo-input').click()">Browse Files</button>
                     </div>
                 </div>
@@ -1049,6 +1498,7 @@
                             opacity: 1;
                             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                             transition: all 0.2s ease;
+                            display: none;
                         "
                         onmouseover="this.style.background='#5a6268'"
                         onmouseout="this.style.background='#6c757d'"
@@ -1065,64 +1515,100 @@
 
             <!-- Details Tab Content -->
             <div class="content-area details-content" id="details-content">
+                <!-- Device ID Header -->
+                <div class="device-id-header">
+                    <div class="device-info">
+                        <span class="robot-icon">🤖</span>
+                        <span class="device-id-label">Device ID:</span>
+                        <span class="device-id-value" id="device-id">Loading...</span>
+                    </div>
+                    </div>
+
+                <!-- Metrics Grid -->
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-value" id="match-percentage">73%</div>
-                        <div class="metric-label">Match Percentage</div>
+                        <div class="metric-value" id="match-percentage">-</div>
+                        <div class="metric-label">Match %</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value" id="total-findings">4</div>
-                        <div class="metric-label">Total Findings</div>
+                        <div class="metric-value" id="total-checks">-</div>
+                        <div class="metric-label">Total Checks</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value" id="critical-issues">1</div>
-                        <div class="metric-label">Critical Issues</div>
+                        <div class="metric-value" id="critical-issues">-</div>
+                        <div class="metric-label">Critical</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value" id="high-issues">1</div>
-                        <div class="metric-label">High Issues</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" id="medium-issues">1</div>
-                        <div class="metric-label">Medium Issues</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" id="low-issues">1</div>
-                        <div class="metric-label">Low Issues</div>
+                        <div class="metric-value" id="open-issues">-</div>
+                        <div class="metric-label">Open Issues</div>
                     </div>
                 </div>
 
-                <div class="chart-container">
-                    <div class="chart-title">Severity Distribution</div>
-                    <div style="height: 200px; position: relative;">
-                        <canvas id="severityChart" width="300" height="200"></canvas>
+                <!-- Key Findings Section -->
+                <div class="findings-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Key Findings</h3>
+                        <div class="search-filter-container">
+                            <div class="search-container">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" class="search-input" placeholder="Search" id="findings-search">
+                            </div>
+                            <button class="filter-button">
+                                <span class="filter-icon">🔧</span>
+                                Filter
+                            </button>
                     </div>
                 </div>
 
-                <div class="chart-container">
-                    <div class="chart-title">Findings by Category</div>
+                    <!-- Findings Table -->
                     <div class="table-responsive">
                         <table class="findings-table">
                                                     <thead>
                             <tr>
-                                <th>Field</th>
-                                <th>Expected Value</th>
-                                <th>Actual Value</th>
-                                <th>Match Type</th>
-                                <th>Match Details</th>
+                                    <th>Key</th>
+                                    <th>Status</th>
+                                    <th>Severity</th>
+                                    <th>Expected</th>
+                                    <th>Actual</th>
+                                    <th>Description</th>
                             </tr>
                         </thead>
                             <tbody id="findings-table-body">
-                                <tr>
-                                    <td>Device & Model</td>
-                                    <td>Windows 11 Pro, Intel Xeon</td>
-                                    <td>Windows 10 Pro, Intel i7</td>
-                                    <td>75%</td>
-                                    <td><span class="severity-badge severity-medium">Partial</span></td>
-                                    <td>OS version mismatch, CPU different</td>
-                                </tr>
+                                <!-- Table will be populated with real data -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Severity Distribution Chart -->
+                <div class="chart-container">
+                    <div class="chart-title">Validation Issues by Severity</div>
+                    <div class="chart-content">
+                        <div class="chart-wrapper">
+                            <canvas id="severityChart" width="300" height="200"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color critical"></span>
+                                <span class="legend-label">Critical</span>
+                                <span class="legend-count" id="critical-count">-</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color high"></span>
+                                <span class="legend-label">High</span>
+                                <span class="legend-count" id="high-count">-</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color medium"></span>
+                                <span class="legend-label">Medium</span>
+                                <span class="legend-count" id="medium-count">-</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color low"></span>
+                                <span class="legend-label">Low</span>
+                                <span class="legend-count" id="low-count">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1133,13 +1619,13 @@
             <!-- Header -->
             <div class="right-header">
                 <div class="header-left">
-                    <span class="robot-icon">🤖</span>
-                    <span class="header-title">Configure Validator</span>
+                    
                 </div>
                 <button class="export-button" onclick="showExportModal()">
                     📤 Export
                 </button>
             </div>
+            
 
             <!-- Chat Container -->
             <div class="chat-container">
@@ -1652,14 +2138,14 @@
                     }
                     
                     if (blob) {
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
                         a.download = filename;
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        
-                        closeExportModal();
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    closeExportModal();
                     } else {
                         throw new Error('Failed to create download data');
                     }
@@ -1757,21 +2243,56 @@
                 }
             };
             
-            // Update metrics with error handling
-            updateMetric('match-percentage', result.match_percentage + '%');
-            updateMetric('total-findings', result.details.length);
+            // Extract device ID from validation results
+            let deviceId = 'Unknown';
+            if (result.details && result.details.length > 0) {
+                // Look for Series No or similar identifier
+                const seriesDetail = result.details.find(d => 
+                    d.key.toLowerCase().includes('series') || 
+                    d.key.toLowerCase().includes('csname') ||
+                    d.key.toLowerCase().includes('device')
+                );
+                if (seriesDetail) {
+                    // Extract the actual value from the explanation or expected field
+                    if (seriesDetail.expected) {
+                        deviceId = seriesDetail.expected;
+                    } else if (seriesDetail.explanation) {
+                        // Try to extract from explanation
+                        const match = seriesDetail.explanation.match(/matched_key=([^,\s)]+)/);
+                        if (match) {
+                            deviceId = match[1];
+                        }
+                    }
+                }
+            }
             
+            // Update device ID
+            updateMetric('device-id', deviceId);
+            
+            // Calculate real metrics from validation results
+            const totalChecks = result.details.length;
             const criticalCount = result.details.filter(d => d.severity === 'critical').length;
             const highCount = result.details.filter(d => d.severity === 'high').length;
             const mediumCount = result.details.filter(d => d.severity === 'medium').length;
             const lowCount = result.details.filter(d => d.severity === 'low').length;
             
+            // Calculate match percentage based on actual results
+            const matchCount = result.details.filter(d => d.status === 'match').length;
+            const matchPercentage = totalChecks > 0 ? Math.round((matchCount / totalChecks) * 100) : 0;
+            
+            // Update metrics with real calculated values
+            updateMetric('match-percentage', matchPercentage + '%');
+            updateMetric('total-checks', totalChecks);
             updateMetric('critical-issues', criticalCount);
-            updateMetric('high-issues', highCount);
-            updateMetric('medium-issues', mediumCount);
-            updateMetric('low-issues', lowCount);
+            updateMetric('open-issues', totalChecks); // All findings are open issues to address
 
-            // Create severity distribution chart
+            // Update chart legend with real counts
+            updateMetric('critical-count', `${criticalCount} (${criticalCount > 0 ? Math.round((criticalCount / totalChecks) * 100) : 0}%)`);
+            updateMetric('high-count', `${highCount} (${highCount > 0 ? Math.round((highCount / totalChecks) * 100) : 0}%)`);
+            updateMetric('medium-count', `${mediumCount} (${mediumCount > 0 ? Math.round((mediumCount / totalChecks) * 100) : 0}%)`);
+            updateMetric('low-count', `${lowCount} (${lowCount > 0 ? Math.round((lowCount / totalChecks) * 100) : 0}%)`);
+
+            // Create severity distribution chart with real data
             createSeverityChart(criticalCount, highCount, mediumCount, lowCount);
 
             // Update findings table with enhanced information
@@ -1790,30 +2311,54 @@
                 
                 // Determine match type and styling
                 let matchType = detail.status;
-                let matchClass = 'match-type-' + detail.status;
-                
-                if (detail.status === 'match') {
-                    matchType = '✅ Exact Match';
-                    matchClass = 'match-type-exact';
-                } else if (detail.status === 'partial') {
-                    matchType = '⚠️ Partial Match';
-                    matchClass = 'match-type-partial';
+                let matchClass = 'status-match'; // Default to match
+                let severityClass = 'severity-low'; // Default to low
+
+                if (detail.status === 'partial') {
+                    matchType = 'Partial';
+                    matchClass = 'status-partial';
                 } else if (detail.status === 'mismatch') {
-                    matchType = '❌ No Match';
-                    matchClass = 'match-type-mismatch';
+                    matchType = 'No Match';
+                    matchClass = 'status-mismatch';
+                }
+
+                if (detail.severity === 'high') {
+                    severityClass = 'severity-high';
+                } else if (detail.severity === 'medium') {
+                    severityClass = 'severity-medium';
+                } else if (detail.severity === 'low') {
+                    severityClass = 'severity-low';
+                }
+                
+                // Extract expected and actual values
+                let expectedValue = 'N/A';
+                let actualValue = 'N/A';
+                
+                if (detail.expected) {
+                    expectedValue = truncate(detail.expected, 25);
+                }
+                if (detail.actual) {
+                    actualValue = truncate(detail.actual, 25);
+                } else if (detail.explanation) {
+                    // Try to extract actual value from explanation
+                    const actualMatch = detail.explanation.match(/found\s+\[([^\]]+)\]/);
+                    if (actualMatch) {
+                        actualValue = truncate(actualMatch[1], 25);
+                    }
                 }
                 
                 row.innerHTML = `
                     <td><strong>${detail.key}</strong></td>
-                    <td title="${Array.isArray(detail.expected) ? detail.expected.join(', ') : detail.expected}">${truncate(detail.expected)}</td>
-                    <td title="${Array.isArray(detail.actual) ? detail.actual.join(', ') : detail.actual}">${truncate(detail.actual)}</td>
                     <td><span class="${matchClass}">${matchType}</span></td>
-                    <td title="${detail.explanation}">${truncate(detail.explanation, 60)}</td>
+                    <td><span class="${severityClass}">${detail.severity}</span></td>
+                    <td title="${detail.expected || 'N/A'}">${expectedValue}</td>
+                    <td title="${detail.actual || 'N/A'}">${actualValue}</td>
+                    <td title="${detail.explanation}">${truncate(detail.explanation, 50)}</td>
                 `;
                 tbody.appendChild(row);
             });
             
-            console.log('Enhanced details tab updated successfully');
+            console.log('Enhanced details tab updated successfully with real data');
         }
 
         // Weightage system removed - focusing on detailed match results
@@ -1834,6 +2379,9 @@
                 runBtn.disabled = true;
                 runBtn.style.opacity = '0.5';
             }
+            
+            // Initialize search and filter functionality
+            initializeSearchAndFilter();
         });
 
         // Create severity distribution chart
@@ -1845,22 +2393,24 @@
                 window.severityChartInstance.destroy();
             }
             
+            const total = critical + high + medium + low;
+            
+            if (total === 0) {
+                // Show empty state
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No validation data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
             const data = [
                 { label: 'Critical', value: critical, color: '#dc3545' },
                 { label: 'High', value: high, color: '#fd7e14' },
                 { label: 'Medium', value: medium, color: '#ffc107' },
                 { label: 'Low', value: low, color: '#28a745' }
             ].filter(item => item.value > 0); // Only show categories with values
-            
-            if (data.length === 0) {
-                // Show empty state
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.fillStyle = '#666';
-                ctx.font = '14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('No severity data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                return;
-            }
             
             window.severityChartInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -1887,7 +2437,6 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = ((context.parsed / total) * 100).toFixed(1);
                                     return `${context.label}: ${context.parsed} (${percentage}%)`;
                                 }
@@ -1972,6 +2521,135 @@
             }
             
             console.log('🧪 === END TEST ===');
+        }
+
+        // Function to get system snapshot
+        async function getSystemSnapshot() {
+            try {
+                console.log('Getting system snapshot...');
+                
+                // Show loading state
+                const btn = document.getElementById('get-snapshot-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Generating...';
+                btn.disabled = true;
+                
+                const response = await fetch('/api/snapshot', {
+                    method: 'GET'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('System snapshot result:', result);
+                
+                if (result.success) {
+                    // Show success status
+                    document.getElementById('snapshot-status').style.display = 'block';
+                    
+                    // Log the full snapshot data
+                    console.log('📊 Complete System Snapshot:');
+                    console.log(JSON.stringify(result.snapshot, null, 2));
+                    
+                    // Store snapshot for validation use
+                    if (!window.uploadedFiles) {
+                        window.uploadedFiles = {};
+                    }
+                    window.uploadedFiles.snapshot = {
+                        filename: 'system_snapshot.json',
+                        content: result.snapshot
+                    };
+                    
+                    console.log('✅ System snapshot stored and ready for validation');
+                } else {
+                    throw new Error(result.error || 'Failed to generate snapshot');
+                }
+            } catch (error) {
+                console.error('Snapshot error:', error);
+                alert('Failed to generate system snapshot: ' + error.message);
+            } finally {
+                // Reset button state
+                const btn = document.getElementById('get-snapshot-btn');
+                btn.innerHTML = '📊 Get System Snapshot';
+                btn.disabled = false;
+            }
+        }
+
+        // Search and Filter functionality
+        function initializeSearchAndFilter() {
+            const searchInput = document.getElementById('findings-search');
+            const filterButton = document.querySelector('.filter-button');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    filterFindings();
+                });
+            }
+            
+            if (filterButton) {
+                filterButton.addEventListener('click', function() {
+                    toggleFilterOptions();
+                });
+            }
+        }
+
+        function filterFindings() {
+            const searchTerm = document.getElementById('findings-search').value.toLowerCase();
+            const tableBody = document.getElementById('findings-table-body');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleFilterOptions() {
+            // Create filter dropdown if it doesn't exist
+            let filterDropdown = document.querySelector('.filter-dropdown');
+            
+            if (!filterDropdown) {
+                filterDropdown = document.createElement('div');
+                filterDropdown.className = 'filter-dropdown';
+                filterDropdown.innerHTML = `
+                    <div class="filter-option" onclick="filterBySeverity('all')">All Severities</div>
+                    <div class="filter-option" onclick="filterBySeverity('low')">Low Only</div>
+                    <div class="filter-option" onclick="filterBySeverity('medium')">Medium Only</div>
+                    <div class="filter-option" onclick="filterBySeverity('high')">High Only</div>
+                    <div class="filter-option" onclick="filterBySeverity('critical')">Critical Only</div>
+                `;
+                
+                const filterButton = document.querySelector('.filter-button');
+                filterButton.parentNode.appendChild(filterDropdown);
+            }
+            
+            filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function filterBySeverity(severity) {
+            const tableBody = document.getElementById('findings-table-body');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const severityCell = row.querySelector('.severity-badge');
+                if (severity === 'all' || (severityCell && severityCell.textContent.toLowerCase() === severity)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Hide filter dropdown
+            const filterDropdown = document.querySelector('.filter-dropdown');
+            if (filterDropdown) {
+                filterDropdown.style.display = 'none';
+            }
         }
     </script>
 </body>
