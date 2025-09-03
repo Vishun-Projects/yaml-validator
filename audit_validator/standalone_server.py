@@ -27,7 +27,111 @@ try:
         build_exec_pdf_bytes
     )
     print("✅ Successfully imported real AI functionality from streamlit_app")
-    StandaloneAI = ai_audit_gui
+    # Use our local enhanced snapshot collection instead of ai_audit_gui
+    class EnhancedStandaloneAI:
+        @staticmethod
+        def collect_full_snapshot(interactive_ui=False, collect_apps_flag=False):
+            """Collect actual system snapshot data for validation"""
+            try:
+                import platform
+                import psutil
+                import socket
+                import os
+                
+                snapshot = {
+                    "device": platform.node(),
+                    "collected": True,
+                    "collected_at": datetime.utcnow().isoformat(),
+                    
+                    # System information
+                    "platform": platform.system(),
+                    "platform_version": platform.version(),
+                    "machine": platform.machine(),
+                    "processor": platform.processor(),
+                    
+                    # Hardware info
+                    "cpu_count": psutil.cpu_count(),
+                    "memory_total": f"{psutil.virtual_memory().total // (1024**3)} GB",
+                    "memory_available": f"{psutil.virtual_memory().available // (1024**3)} GB",
+                    
+                    # Network info
+                    "hostname": socket.gethostname(),
+                    "fqdn": socket.getfqdn(),
+                    
+                    # OS info
+                    "os_name": platform.system(),
+                    "os_version": platform.version(),
+                    "os_release": platform.release(),
+                    
+                    # Environment info
+                    "username": os.getenv('USERNAME') or os.getenv('USER'),
+                    "home_dir": os.path.expanduser('~'),
+                    "current_dir": os.getcwd(),
+                    
+                    # Windows specific
+                    "windows_directory": os.getenv('WINDIR', 'C:\\Windows'),
+                    "program_files": os.getenv('PROGRAMFILES', 'C:\\Program Files'),
+                    
+                    # Language and locale
+                    "language": os.getenv('LANG') or 'en-US',
+                    "timezone": os.getenv('TZ') or 'UTC'
+                }
+                
+                # Add disk information
+                try:
+                    disk_partitions = psutil.disk_partitions()
+                    disk_info = []
+                    for partition in disk_partitions:
+                        if partition.device:
+                            usage = psutil.disk_usage(partition.mountpoint)
+                            disk_info.append({
+                                "device": partition.device,
+                                "mountpoint": partition.mountpoint,
+                                "filesystem": partition.fstype,
+                                "total": f"{usage.total // (1024**3)} GB",
+                                "free": f"{usage.free // (1024**3)} GB"
+                            })
+                    snapshot["disks"] = disk_info
+                except Exception as e:
+                    snapshot["disks"] = [{"error": str(e)}]
+                
+                # Add network interfaces
+                try:
+                    net_if_addrs = psutil.net_if_addrs()
+                    network_info = []
+                    for interface, addrs in net_if_addrs.items():
+                        for addr in addrs:
+                            if addr.family == socket.AF_INET:  # IPv4
+                                network_info.append({
+                                    "interface": interface,
+                                    "address": addr.address,
+                                    "netmask": addr.netmask
+                                })
+                    snapshot["network_interfaces"] = network_info
+                except Exception as e:
+                    snapshot["network_interfaces"] = [{"error": str(e)}]
+                
+                print(f"✅ Collected system snapshot with {len(snapshot)} fields")
+                print(f"📊 Snapshot keys: {list(snapshot.keys())}")
+                print(f"📊 Snapshot sample: {dict(list(snapshot.items())[:5])}")
+                return snapshot
+                
+            except Exception as e:
+                print(f"❌ Error collecting snapshot: {e}")
+                # Fallback to basic info
+                return {
+                    "device": "fallback-device",
+                    "collected": True,
+                    "collected_at": datetime.utcnow().isoformat(),
+                    "error": str(e)
+                }
+        
+        @staticmethod
+        def validate_against_yaml(cfg, snap):
+            # Use our enhanced validation instead
+            return None  # This will force the use of our enhanced_validation method
+    
+    StandaloneAI = EnhancedStandaloneAI
 except ImportError as e:
     print(f"⚠️ Warning: Could not import from streamlit_app: {e}")
     print("Using fallback AI implementation")
@@ -36,7 +140,98 @@ except ImportError as e:
     class _FakeAI:
         @staticmethod
         def collect_full_snapshot(interactive_ui=False, collect_apps_flag=False):
-            return {"device": "demo-device", "collected": True, "collected_at": datetime.utcnow().isoformat()}
+            """Collect actual system snapshot data for validation"""
+            try:
+                import platform
+                import psutil
+                import socket
+                import os
+                
+                snapshot = {
+                    "device": platform.node(),
+                    "collected": True,
+                    "collected_at": datetime.utcnow().isoformat(),
+                    
+                    # System information
+                    "platform": platform.system(),
+                    "platform_version": platform.version(),
+                    "machine": platform.machine(),
+                    "processor": platform.processor(),
+                    
+                    # Hardware info
+                    "cpu_count": psutil.cpu_count(),
+                    "memory_total": f"{psutil.virtual_memory().total // (1024**3)} GB",
+                    "memory_available": f"{psutil.virtual_memory().available // (1024**3)} GB",
+                    
+                    # Network info
+                    "hostname": socket.gethostname(),
+                    "fqdn": socket.getfqdn(),
+                    
+                    # OS info
+                    "os_name": platform.system(),
+                    "os_version": platform.version(),
+                    "os_release": platform.release(),
+                    
+                    # Environment info
+                    "username": os.getenv('USERNAME') or os.getenv('USER'),
+                    "home_dir": os.path.expanduser('~'),
+                    "current_dir": os.getcwd(),
+                    
+                    # Windows specific
+                    "windows_directory": os.getenv('WINDIR', 'C:\\Windows'),
+                    "program_files": os.getenv('PROGRAMFILES', 'C:\\Program Files'),
+                    
+                    # Language and locale
+                    "language": os.getenv('LANG') or 'en-US',
+                    "timezone": os.getenv('TZ') or 'UTC'
+                }
+                
+                # Add disk information
+                try:
+                    disk_partitions = psutil.disk_partitions()
+                    disk_info = []
+                    for partition in disk_partitions:
+                        if partition.device:
+                            usage = psutil.disk_usage(partition.mountpoint)
+                            disk_info.append({
+                                "device": partition.device,
+                                "mountpoint": partition.mountpoint,
+                                "filesystem": partition.fstype,
+                                "total": f"{usage.total // (1024**3)} GB",
+                                "free": f"{usage.free // (1024**3)} GB"
+                            })
+                    snapshot["disks"] = disk_info
+                except Exception as e:
+                    snapshot["disks"] = [{"error": str(e)}]
+                
+                # Add network interfaces
+                try:
+                    net_if_addrs = psutil.net_if_addrs()
+                    network_info = []
+                    for interface, addrs in net_if_addrs.items():
+                        for addr in addrs:
+                            if addr.family == socket.AF_INET:  # IPv4
+                                network_info.append({
+                                    "interface": interface,
+                                    "address": addr.address,
+                                    "netmask": addr.netmask
+                                })
+                    snapshot["network_interfaces"] = network_info
+                except Exception as e:
+                    snapshot["network_interfaces"] = [{"error": str(e)}]
+                
+                print(f"✅ Collected system snapshot with {len(snapshot)} fields")
+                return snapshot
+                
+            except Exception as e:
+                print(f"❌ Error collecting snapshot: {e}")
+                # Fallback to basic info
+                return {
+                    "device": "fallback-device",
+                    "collected": True,
+                    "collected_at": datetime.utcnow().isoformat(),
+                    "error": str(e)
+                }
 
         @staticmethod
         def collect_generic_snapshot():
@@ -542,6 +737,8 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             print(f"Config content length: {len(config_yaml)}")
             
             # Enhanced validation with field parsing
+            print(f"🔍 About to call enhanced_validation with snapshot type: {type(snapshot)}")
+            print(f"🔍 Snapshot keys: {list(snapshot.keys()) if isinstance(snapshot, dict) else 'Not a dict'}")
             result = self.enhanced_validation(config_yaml, snapshot, user_preferences)
             print(f"Enhanced validation result: {result}")
             
@@ -567,10 +764,164 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({'error': str(e)}).encode())
     
+    def _find_actual_value(self, snapshot, key):
+        """Intelligently find actual value in snapshot based on field key"""
+        key_lower = key.lower()
+        
+        # Direct key matches
+        if key in snapshot:
+            return snapshot[key]
+        
+        # Intelligent field mapping for specific Excel fields
+        if 'series' in key_lower or 'device' in key_lower:
+            # Look for device/hostname information
+            for field in ['device', 'hostname', 'fqdn', 'machine']:
+                if field in snapshot:
+                    return snapshot[field]
+        
+        elif 'device & model' in key_lower:
+            # Composite device model information
+            device_parts = []
+            if 'platform' in snapshot:
+                device_parts.append(snapshot['platform'])
+            if 'os_name' in snapshot:
+                device_parts.append(snapshot['os_name'])
+            if 'processor' in snapshot:
+                device_parts.append(snapshot['processor'])
+            if 'memory_total' in snapshot:
+                device_parts.append(snapshot['memory_total'])
+            if device_parts:
+                return ', '.join(device_parts)
+        
+        elif 'os' in key_lower or 'windows' in key_lower:
+            # Look for OS information
+            for field in ['os_name', 'platform', 'platform_version']:
+                if field in snapshot:
+                    return snapshot[field]
+        
+        elif 'cpu' in key_lower or 'processor' in key_lower:
+            # Look for CPU information
+            for field in ['processor', 'cpu_count']:
+                if field in snapshot:
+                    return snapshot[field]
+        
+        elif 'memory' in key_lower or 'ram' in key_lower:
+            # Look for memory information
+            for field in ['memory_total', 'memory_available']:
+                if field in snapshot:
+                    return snapshot[field]
+        
+        elif 'storage' in key_lower or 'ssd' in key_lower or 'hdd' in key_lower:
+            # Look for storage information
+            if 'disks' in snapshot and snapshot['disks']:
+                disk_info = snapshot['disks'][0]  # First disk
+                return f"{disk_info.get('filesystem', 'Unknown')} {disk_info.get('total', 'Unknown')}"
+        
+        elif 'language' in key_lower:
+            # Look for language information
+            for field in ['language', 'os_language']:
+                if field in snapshot:
+                    return snapshot[field]
+        
+        elif 'keyboard' in key_lower or 'input' in key_lower:
+            # Default keyboard layout
+            return 'en-US'  # Common default
+        
+        elif 'install' in key_lower or 'location' in key_lower or 'directory' in key_lower:
+            # Look for directory information
+            for field in ['windows_directory', 'program_files', 'home_dir', 'current_dir']:
+                if field in snapshot:
+                    return snapshot[field]
+        
+        # Try partial matches
+        for snapshot_key, value in snapshot.items():
+            if key_lower in snapshot_key.lower() or snapshot_key.lower() in key_lower:
+                return value
+        
+        return 'Not found'
+
+    def _calculate_improved_match_score(self, expected_fields, actual_fields, field_key):
+        """Calculate improved match score for Excel fields"""
+        if not expected_fields:
+            return 0, [], []
+        
+        if not actual_fields:
+            return 0, [], expected_fields
+        
+        matched_fields = []
+        mismatched_fields = []
+        total_score = 0
+        
+        field_key_lower = field_key.lower()
+        
+        for expected_field in expected_fields:
+            expected_lower = str(expected_field).lower()
+            best_match = None
+            best_score = 0
+            
+            # Try to find best match in actual fields
+            for actual_field in actual_fields:
+                actual_lower = str(actual_field).lower()
+                
+                # Exact match
+                if expected_lower == actual_lower:
+                    score = 100
+                # Contains match
+                elif expected_lower in actual_lower or actual_lower in expected_lower:
+                    score = 85
+                # Partial word match
+                elif any(word in actual_lower for word in expected_lower.split()):
+                    score = 70
+                # Number match (for RAM, storage sizes)
+                elif self._extract_numbers(expected_lower) and self._extract_numbers(actual_lower):
+                    expected_num = self._extract_numbers(expected_lower)
+                    actual_num = self._extract_numbers(actual_lower)
+                    if abs(expected_num - actual_num) <= 2:
+                        score = 60
+                    else:
+                        score = 20
+                else:
+                    score = 0
+                
+                if score > best_score:
+                    best_score = score
+                    best_match = actual_field
+            
+            # Determine if this field is matched
+            if best_score >= 60:
+                matched_fields.append({
+                    'expected': expected_field,
+                    'actual': best_match,
+                    'score': best_score
+                })
+                total_score += best_score
+            else:
+                mismatched_fields.append({
+                    'expected': expected_field,
+                    'actual': 'Not found',
+                    'score': 0
+                })
+        
+        # Calculate overall score
+        if expected_fields:
+            overall_score = total_score / len(expected_fields)
+        else:
+            overall_score = 0
+        
+        return overall_score, matched_fields, mismatched_fields
+
+    def _extract_numbers(self, text):
+        """Extract first number from text"""
+        import re
+        numbers = re.findall(r'\d+', str(text))
+        return int(numbers[0]) if numbers else 0
+
     def enhanced_validation(self, config_yaml, snapshot, user_preferences):
         """Enhanced validation with Excel field parsing and user preferences"""
         try:
             print("🔍 Starting enhanced validation with field parsing...")
+            print(f"📊 Snapshot keys: {list(snapshot.keys())}")
+            print(f"📊 Snapshot sample: {dict(list(snapshot.items())[:5])}")
             
             # Parse config
             config_data = yaml.safe_load(config_yaml)
@@ -603,8 +954,8 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 print(f"\n🔍 Validating field: {key}")
                 print(f"   Expected: {expected_value}")
                 
-                # Get actual value from snapshot
-                actual_value = snapshot.get(key, 'Not found')
+                # Get actual value from snapshot with intelligent field mapping
+                actual_value = self._find_actual_value(snapshot, key)
                 print(f"   Actual: {actual_value}")
                 
                 # Parse expected value into individual fields
@@ -621,9 +972,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 else:
                     actual_fields = [str(actual_value)] if actual_value else []
                 
-                # Calculate field match score
-                score, matched_fields, mismatched_fields = calculate_field_match_score(
-                    expected_fields, actual_fields, {'field_weights': field_weights}
+                # Calculate field match score with improved logic
+                score, matched_fields, mismatched_fields = self._calculate_improved_match_score(
+                    expected_fields, actual_fields, key
                 )
                 
                 print(f"   Match score: {score:.1f}%")

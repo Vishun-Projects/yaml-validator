@@ -1030,6 +1030,37 @@
                     </div>
                 </div>
                 
+                <!-- System Snapshot Button -->
+                <div style="margin-top: 15px; text-align: left;">
+                    <button 
+                        id="get-snapshot-btn"
+                        onclick="getSystemSnapshot()"
+                        style="
+                            width: 201px;
+                            height: 40px;
+                            border-radius: 8px;
+                            padding: 8px 16px;
+                            gap: 6px;
+                            background: #6c757d;
+                            color: #fff;
+                            font-weight: 600;
+                            border: none;
+                            cursor: pointer;
+                            opacity: 1;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            transition: all 0.2s ease;
+                        "
+                        onmouseover="this.style.background='#5a6268'"
+                        onmouseout="this.style.background='#6c757d'"
+                    >
+                        📊 Get System Snapshot
+                    </button>
+                    
+                    <div id="snapshot-status" style="margin-top: 10px; text-align: center; display: none;">
+                        <div style="color: #17a2b8; font-weight: 600;">📊 System snapshot generated!</div>
+                        <div style="color: #666; font-size: 14px;">Check console for full details</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Details Tab Content -->
@@ -1241,19 +1272,17 @@
                 uploadBox.classList.remove('uploaded');
                 uploadBox.innerHTML = `
                     <div class="upload-icon">☁️</div>
-                    <div class="upload-text">Drop file or <span class="highlight">${fileType === 'config' || fileType === 'run-validation-btn' ? 'Browse' : 'browse'}</span></div>
+                    <div class="upload-text">Drop file or <span class="highlight">${fileType === 'config' || fileType === 'snapshot' ? 'Browse' : 'browse'}</span></div>
                     <div class="upload-format">Format: ${getFormatText(fileType)} & Max file size: 25 MB</div>
                     <div class="upload-filename" id="${fileType}-filename" style="display: none;"></div>
                 `;
             }
-            
-            // Weightage system removed - focusing on detailed match results
         }
 
         function getFormatText(fileType) {
             switch(fileType) {
                 case 'logo': return '.jpeg, .png';
-                case 'config': return 'pdf, docx, doc';
+                case 'config': return 'pdf, docx, doc, xlsx, xls, yaml, yml';
                 case 'snapshot': return 'json';
                 default: return 'all files';
             }
@@ -1279,24 +1308,21 @@
                     if (!window.uploadedFiles) {
                         window.uploadedFiles = {};
                     }
-                    window.uploadedFiles[type] = result.filename;
+                    window.uploadedFiles[type] = {
+                        filename: result.filename,
+                        content: result.content || null
+                    };
                     console.log(`${type} file uploaded successfully:`, result.filename);
                     console.log('Updated uploaded files:', window.uploadedFiles);
-                    
-                    // Store Excel columns if available
-                    if (type === 'config' && result.columns) {
-                        window.uploadedExcelColumns = result.columns;
-                        console.log('✅ Excel columns received:', result.columns);
-                        console.log('📊 Number of columns:', result.columns.length);
-                    } else {
-                        console.log('❌ No columns received in result:', result);
-                        console.log('🔍 Result keys:', Object.keys(result));
-                    }
                     
                     // Show visual feedback
                     showUploadSuccess(type, result.filename);
                     
-                    // Weightage system removed - focusing on detailed match results
+                    // Enable validation button if we have config file
+                    if (type === 'config') {
+                        document.getElementById('run-validation-btn').disabled = false;
+                        document.getElementById('run-validation-btn').style.opacity = '1';
+                    }
                 } else {
                     console.error('Upload failed:', result.error);
                     alert(`Upload failed: ${result.error}`);
@@ -1600,23 +1626,51 @@
                 
                 const result = await response.json();
                 if (result.success) {
-                    // Create download link
-                    const blob = new Blob([result.data], { type: 'text/plain' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = result.filename;
-                    a.click();
-                    window.URL.revokeObjectURL(url);
+                    // Create download link based on response type
+                    let blob, filename, mimeType;
                     
-                    closeExportModal();
+                    if (exportType === 'json') {
+                        blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+                        filename = result.filename || 'validation_report.json';
+                    } else if (exportType === 'csv') {
+                        blob = new Blob([result.data], { type: 'text/csv' });
+                        filename = result.filename || 'findings.csv';
+                    } else if (exportType === 'pdf') {
+                        if (result.mime_type === 'application/pdf') {
+                            // Handle PDF data (base64 encoded)
+                            const pdfBytes = atob(result.data);
+                            const pdfArray = new Uint8Array(pdfBytes.length);
+                            for (let i = 0; i < pdfBytes.length; i++) {
+                                pdfArray[i] = pdfBytes.charCodeAt(i);
+                            }
+                            blob = new Blob([pdfArray], { type: 'application/pdf' });
+                        } else {
+                            // Handle text fallback
+                            blob = new Blob([result.data], { type: 'text/plain' });
+                        }
+                        filename = result.filename || 'validation_report.pdf';
+                    }
+                    
+                    if (blob) {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        
+                        closeExportModal();
+                    } else {
+                        throw new Error('Failed to create download data');
+                    }
+                } else {
+                    alert('Export failed: ' + (result.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Export error:', error);
+                alert('Export failed: ' + error.message);
             }
         }
-
-        // Enhanced validation function is now defined above
 
         function showLoadingOverlay() {
             document.getElementById('loading-overlay').classList.add('show');
@@ -1625,150 +1679,6 @@
         function hideLoadingOverlay() {
             document.getElementById('loading-overlay').classList.remove('show');
         }
-
-        function updateDetailsTab(result) {
-            console.log('Updating details tab with result:', result);
-            
-            // Helper function for safe element updates
-            const updateMetric = (id, value) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                } else {
-                    console.warn(`Element with id '${id}' not found`);
-                }
-            };
-            
-            // Update metrics with error handling
-            updateMetric('match-percentage', result.match_percentage + '%');
-            updateMetric('total-findings', result.details.length);
-            
-            const criticalCount = result.details.filter(d => d.severity === 'critical').length;
-            const highCount = result.details.filter(d => d.severity === 'high').length;
-            const mediumCount = result.details.filter(d => d.severity === 'medium').length;
-            const lowCount = result.details.filter(d => d.severity === 'low').length;
-            
-            updateMetric('critical-issues', criticalCount);
-            updateMetric('high-issues', highCount);
-            updateMetric('medium-issues', mediumCount);
-            updateMetric('low-issues', lowCount);
-
-            // Create severity distribution chart
-            createSeverityChart(criticalCount, highCount, mediumCount, lowCount);
-
-            // Update findings table
-            const tbody = document.getElementById('findings-table-body');
-            tbody.innerHTML = '';
-            
-            result.details.forEach(detail => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${detail.key}</td>
-                    <td><span class="severity-badge severity-${detail.severity}">${detail.severity}</span></td>
-                    <td>${detail.status}</td>
-                    <td>${detail.explanation}</td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            console.log('Details tab updated successfully');
-        }
-
-        function createSeverityChart(critical, high, medium, low) {
-            const ctx = document.getElementById('severityChart').getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (window.severityChartInstance) {
-                window.severityChartInstance.destroy();
-            }
-            
-            const data = [
-                { label: 'Critical', value: critical, color: '#dc3545' },
-                { label: 'High', value: high, color: '#fd7e14' },
-                { label: 'Medium', value: medium, color: '#ffc107' },
-                { label: 'Low', value: low, color: '#28a745' }
-            ].filter(item => item.value > 0); // Only show categories with values
-            
-            if (data.length === 0) {
-                // Show empty state
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.fillStyle = '#666';
-                ctx.font = '14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('No severity data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                return;
-            }
-            
-            window.severityChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.map(item => item.label),
-                    datasets: [{
-                        data: data.map(item => item.value),
-                        backgroundColor: data.map(item => item.color),
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Enter key for chat
-        document.getElementById('chat-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        // Drag and drop
-        document.querySelectorAll('.upload-box').forEach(box => {
-            box.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                box.style.borderColor = box.classList.contains('orange') ? '#e67e00' : '#6a1b9a';
-            });
-            
-            box.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                box.style.borderColor = box.classList.contains('orange') ? '#ff8c00' : '#8a2be2';
-            });
-            
-            box.addEventListener('drop', (e) => {
-                e.preventDefault();
-                box.style.borderColor = box.classList.contains('orange') ? '#ff8c00' : '#8a2be2';
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    const file = files[0];
-                    const inputId = box.parentElement.querySelector('.file-input').id;
-                    const type = inputId.replace('-input', '');
-                    uploadFile(file, type);
-                }
-            });
-        });
-
-        // Weightage system removed - focusing on detailed match results
 
         // Enhanced validation function
         async function runValidation() {
@@ -1784,21 +1694,22 @@
             showLoadingOverlay();
 
             try {
-                // If snapshot is uploaded, use it; otherwise auto-generate
-                const snapshotType = window.uploadedFiles && window.uploadedFiles.snapshot ? 'manual' : 'auto';
-                console.log('Snapshot type:', snapshotType);
-                
-                const requestBody = { 
-                    snapshot_type: snapshotType
-                };
-                console.log('Enhanced validation request:', requestBody);
+                // Check if we have the required files
+                if (!window.uploadedFiles || !window.uploadedFiles.config) {
+                    throw new Error('Configuration file is required for validation');
+                }
+
+                console.log('Running validation with files:', window.uploadedFiles);
                 
                 const response = await fetch('/api/validate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(requestBody)
+                    body: JSON.stringify({ 
+                        config_file: window.uploadedFiles.config.filename,
+                        snapshot_type: window.uploadedFiles.snapshot ? 'manual' : 'auto'
+                    })
                 });
                 
                 console.log('Validation response status:', response.status);
@@ -1917,8 +1828,107 @@
             // Initialize uploadFiles tracking
             window.uploadedFiles = {};
             
-            // Add debug button for troubleshooting
-            addDebugButton();
+            // Disable validation button initially
+            const runBtn = document.getElementById('run-validation-btn');
+            if (runBtn) {
+                runBtn.disabled = true;
+                runBtn.style.opacity = '0.5';
+            }
+        });
+
+        // Create severity distribution chart
+        function createSeverityChart(critical, high, medium, low) {
+            const ctx = document.getElementById('severityChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.severityChartInstance) {
+                window.severityChartInstance.destroy();
+            }
+            
+            const data = [
+                { label: 'Critical', value: critical, color: '#dc3545' },
+                { label: 'High', value: high, color: '#fd7e14' },
+                { label: 'Medium', value: medium, color: '#ffc107' },
+                { label: 'Low', value: low, color: '#28a745' }
+            ].filter(item => item.value > 0); // Only show categories with values
+            
+            if (data.length === 0) {
+                // Show empty state
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No severity data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            window.severityChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        data: data.map(item => item.value),
+                        backgroundColor: data.map(item => item.color),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Enter key for chat
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Drag and drop
+        document.querySelectorAll('.upload-box').forEach(box => {
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.style.borderColor = box.classList.contains('orange') ? '#e67e00' : '#6a1b9a';
+            });
+            
+            box.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                box.style.borderColor = box.classList.contains('orange') ? '#ff8c00' : '#8a2be2';
+            });
+            
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.style.borderColor = box.classList.contains('orange') ? '#ff8c00' : '#8a2be2';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const inputId = box.parentElement.querySelector('.file-input').id;
+                    const type = inputId.replace('-input', '');
+                    uploadFile(file, type);
+                }
+            });
         });
 
         

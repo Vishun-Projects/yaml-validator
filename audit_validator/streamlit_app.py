@@ -795,8 +795,8 @@ if st.button("↑", key="send_chat"):
     except Exception as e:
                 st.session_state.chat_history.append({"role": "assistant", "content": f"Sorry, I couldn't process that: {str(e)}"})
     else:
-            st.session_state.chat_history.append({"role": "assistant", "content": "Please run a validation first to analyze results."})
-        st.rerun()
+                st.session_state.chat_history.append({"role": "assistant", "content": "Please run a validation first to analyze results."})
+            st.rerun()
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)  # End right pane
@@ -956,7 +956,7 @@ if run_now:
         st.stop()
 
     # config
-    if cfg_upload:
+        if cfg_upload:
         config_yaml = read_uploaded_config_cached(cfg_upload.getvalue(), cfg_upload.name)
             else:
         # fallback: look for monika/ YAML
