@@ -27,19 +27,22 @@
 
         /* LEFT PANE - Exactly 50% width */
         .left-pane {
-            width: 50%;
-            background: #f9fafb;
-            border-right: 1px solid #e9ecef;
+            width: 60%;
+            background: #fdfdfd;
+            border-right: 1px solid #000000;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             max-height: 100vh;
         }
+        .session-info {
+  display: none; /* completely hidden */
+}
 
         /* RIGHT PANE - Exactly 50% width */
         .right-pane {
-            width: 50%;
-            background: white;
+            width: 40%;
+            background: #fdfdfd;
             display: flex;
             flex-direction: column;
             max-height: 100vh;
@@ -78,7 +81,7 @@
 
         .tabs-container {
             display: inline-flex;
-            background: #f3f4f6;   /* light grey background */
+            background: #fdfdfd;   /* light grey background */
             border-radius: 12px;   /* pill shape */
             padding: 4px;
         }
@@ -364,7 +367,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            min-height: 80px;
+            min-height: 94px;
             flex-shrink: 0;
         }
 
@@ -408,7 +411,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: #fdfdfd;
             border-radius: 8px;
             overflow: hidden;
             position: relative;
@@ -1360,9 +1363,131 @@
             border-radius: 6px;
             border: 1px solid #bbdefb;
         }
+
+        /* GDPR Consent Banner */
+        .gdpr-consent-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px 20px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .gdpr-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        .gdpr-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .gdpr-text a {
+            color: #3498db;
+            text-decoration: underline;
+        }
+
+        .gdpr-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .gdpr-accept, .gdpr-decline {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gdpr-accept {
+            background: #27ae60;
+            color: white;
+        }
+
+        .gdpr-accept:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+
+        .gdpr-decline {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .gdpr-decline:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        /* Session Info Display */
+        .session-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .session-id {
+            font-family: monospace;
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #bbdefb;
+        }
+
+        .gdpr-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .gdpr-status.compliant {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .gdpr-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
     </style>
 </head>
 <body >
+    <!-- GDPR Consent Banner -->
+    <div id="gdpr-consent-banner" class="gdpr-consent-banner" style="display: none;">
+        <div class="gdpr-content">
+            <div class="gdpr-text">
+                <strong>🍪 Data Processing Notice</strong><br>
+                This application processes configuration files and system data to provide security validation services. 
+                By continuing, you consent to the processing of your data for security audit purposes. 
+                <a href="#" onclick="showGdprDetails()">Learn more about data handling</a>
+            </div>
+            <div class="gdpr-buttons">
+                <button class="gdpr-accept" onclick="acceptGdprConsent()">Accept & Continue</button>
+                <button class="gdpr-decline" onclick="declineGdprConsent()">Decline</button>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <!-- LEFT PANE -->
         <div class="left-pane">
@@ -1388,6 +1513,14 @@
 
             <!-- Executive Tab Content -->
             <div class="content-area" id="executive-content">
+                <!-- Session Info -->
+                <div class="session-info" id="session-info" style="display: none;">
+                    <strong>Session ID:</strong> <span class="session-id" id="session-id-display">-</span>
+                    <span class="gdpr-status" id="gdpr-status">GDPR Compliant</span>
+                    <button class="button button-secondary" onclick="exportGdprData()" style="float: right; margin-left: 10px; display: none;">📊 Export GDPR Data</button>
+                    <button class="button button-secondary" onclick="showSessionDetails()" style="float: right; display: none;">🔍 Session Details</button>
+                </div>
+
                 <!-- Upload Logo Section -->
                 <div class="upload-section">
                     <div class="section-title">Upload Logo</div>
@@ -1696,6 +1829,8 @@
 
         let validationResult = null;
         let chatHistory = [];
+        let currentSessionId = null;
+        let gdprConsentGiven = false;
 
                 // Tab switching
         function switchTab(tabName) {
@@ -2382,6 +2517,9 @@
             
             // Initialize search and filter functionality
             initializeSearchAndFilter();
+            
+            // Show GDPR consent banner
+            showGdprConsentBanner();
         });
 
         // Create severity distribution chart
@@ -2651,6 +2789,362 @@
                 filterDropdown.style.display = 'none';
             }
         }
+
+        // GDPR and Session Management Functions
+        function showGdprConsentBanner() {
+            const banner = document.getElementById('gdpr-consent-banner');
+            if (banner && !gdprConsentGiven) {
+                banner.style.display = 'block';
+                // Adjust main container to account for banner
+                document.querySelector('.main-container').style.marginTop = '80px';
+            }
+        }
+
+        function acceptGdprConsent() {
+            gdprConsentGiven = true;
+            document.getElementById('gdpr-consent-banner').style.display = 'none';
+            document.querySelector('.main-container').style.marginTop = '0';
+            
+            // Create new session
+            createNewSession();
+            
+            // Store consent in localStorage
+            localStorage.setItem('gdpr_consent', 'true');
+            localStorage.setItem('gdpr_consent_date', new Date().toISOString());
+        }
+
+        function declineGdprConsent() {
+            alert('This application requires data processing consent to function. Please accept to continue.');
+        }
+
+        function showGdprDetails() {
+            const details = `
+                **Data Processing Information**
+                
+                **Purpose**: Configuration validation and security audit
+                **Legal Basis**: Legitimate interest in system security
+                **Data Types**: Configuration files, system snapshots, validation results, chat interactions
+                **Retention**: 2 years for operational data, 7 years for audit logs
+                **Your Rights**: Access, rectification, erasure, portability
+                **Contact**: System administrator for data requests
+                
+                **Data Security**: All data is encrypted and stored securely
+                **No Third Parties**: Data is not shared with external parties
+                **Automated Processing**: AI analysis for security insights
+            `;
+            alert(details);
+        }
+
+        function createNewSession() {
+            // Generate new session ID
+            currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Show session info
+            document.getElementById('session-info').style.display = 'block';
+            document.getElementById('session-id-display').textContent = currentSessionId;
+            
+            // Store session ID in localStorage
+            localStorage.setItem('current_session_id', currentSessionId);
+            
+            console.log('✅ New session created:', currentSessionId);
+        }
+
+        function exportGdprData() {
+            if (!currentSessionId) {
+                alert('No active session to export.');
+                return;
+            }
+
+            // Show loading state
+            const exportBtn = document.querySelector('button[onclick="exportGdprData()"]');
+            const originalText = exportBtn.innerHTML;
+            exportBtn.innerHTML = '⏳ Exporting...';
+            exportBtn.disabled = true;
+
+            fetch(`/api/gdpr/export/${currentSessionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Create and download GDPR export file
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `gdpr_export_${currentSessionId}_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    alert('✅ GDPR data exported successfully!');
+                })
+                .catch(error => {
+                    console.error('GDPR export error:', error);
+                    alert('❌ Failed to export GDPR data: ' + error.message);
+                })
+                .finally(() => {
+                    // Reset button state
+                    exportBtn.innerHTML = originalText;
+                    exportBtn.disabled = false;
+                });
+        }
+
+        function showSessionDetails() {
+            if (!currentSessionId) {
+                alert('No active session.');
+                return;
+            }
+
+            const details = `
+                **Session Details**
+                
+                **Session ID**: ${currentSessionId}
+                **Created**: ${new Date().toLocaleString()}
+                **GDPR Status**: Compliant
+                **Data Retention**: 2 years (operational), 7 years (audit)
+                
+                **Files Uploaded**: ${Object.keys(uploadedFiles).filter(k => uploadedFiles[k]).length}
+                **Validation Results**: ${validationResult ? 'Available' : 'Not yet run'}
+                **Chat Messages**: ${chatHistory.length}
+                
+                **Data Categories**:
+                • Configuration files (YAML, Excel, etc.)
+                • System snapshots
+                • Validation findings
+                • AI chat interactions
+                • Audit logs
+                
+                **Your Rights**: You can export all your data or request deletion.
+            `;
+            alert(details);
+        }
+
+        // Enhanced file upload with session tracking
+        async function uploadFile(file, type) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', type);
+
+            // Add session ID to headers if available
+            const headers = {};
+            if (currentSessionId) {
+                headers['X-Session-ID'] = currentSessionId;
+            }
+
+            try {
+                console.log(`Uploading ${type} file:`, file.name);
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: headers
+                });
+                
+                const result = await response.json();
+                console.log('Upload response:', result);
+                
+                if (result.success) {
+                    // Store session ID if returned
+                    if (result.session_id) {
+                        currentSessionId = result.session_id;
+                        document.getElementById('session-info').style.display = 'block';
+                        document.getElementById('session-id-display').textContent = currentSessionId;
+                        localStorage.setItem('current_session_id', currentSessionId);
+                    }
+                    
+                    // Track uploaded files for AI context
+                    if (!window.uploadedFiles) {
+                        window.uploadedFiles = {};
+                    }
+                    window.uploadedFiles[type] = {
+                        filename: result.filename,
+                        content: result.content || null
+                    };
+                    console.log(`${type} file uploaded successfully:`, result.filename);
+                    console.log('Updated uploaded files:', window.uploadedFiles);
+                    
+                    // Show visual feedback
+                    showUploadSuccess(type, result.filename);
+                    
+                    // Enable validation button if we have config file
+                    if (type === 'config') {
+                        document.getElementById('run-validation-btn').disabled = false;
+                        document.getElementById('run-validation-btn').style.opacity = '1';
+                    }
+                } else {
+                    console.error('Upload failed:', result.error);
+                    alert(`Upload failed: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert(`Upload error: ${error.message}`);
+            }
+        }
+
+        // Enhanced validation with session tracking
+        async function runValidation() {
+            console.log('Starting enhanced validation...');
+            console.log('Window uploadedFiles:', window.uploadedFiles);
+            
+            if (!hasCurrentSessionFiles()) {
+                alert('Please upload a config file first.');
+                return;
+            }
+
+            // Show loading overlay
+            showLoadingOverlay();
+
+            try {
+                // Check if we have the required files
+                if (!window.uploadedFiles || !window.uploadedFiles.config) {
+                    throw new Error('Configuration file is required for validation');
+                }
+
+                console.log('Running validation with files:', window.uploadedFiles);
+                
+                // Add session ID to headers if available
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (currentSessionId) {
+                    headers['X-Session-ID'] = currentSessionId;
+                }
+                
+                const response = await fetch('/api/validate', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        config_file: window.uploadedFiles.config.filename,
+                        snapshot_type: window.uploadedFiles.snapshot ? 'manual' : 'auto'
+                    })
+                });
+                
+                console.log('Validation response status:', response.status);
+                const result = await response.json();
+                console.log('Enhanced validation result:', result);
+                
+                if (result.success) {
+                    // Store session ID if returned
+                    if (result.session_id) {
+                        currentSessionId = result.session_id;
+                        document.getElementById('session-info').style.display = 'block';
+                        document.getElementById('session-id-display').textContent = currentSessionId;
+                        localStorage.setItem('current_session_id', currentSessionId);
+                    }
+                    
+                    validationResult = result.result;
+                    updateDetailsTab(validationResult);
+                    
+                    // Show validation success status
+                    document.getElementById('validation-status').style.display = 'block';
+                    document.getElementById('run-validation-btn').style.display = 'none';
+                    
+                    // Update tab states
+                    updateTabStates();
+                    
+                    // Hide loading and switch to details tab with smooth transition
+                    setTimeout(() => {
+                        hideLoadingOverlay();
+                        switchTab('details');
+                    }, 500);
+                } else {
+                    hideLoadingOverlay();
+                    alert('Validation failed: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Validation error:', error);
+                hideLoadingOverlay();
+                alert('Validation failed. Please try again. Error: ' + error.message);
+            }
+        }
+
+        // Enhanced chat with session tracking
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Check if user has files before allowing analysis questions
+            if (!hasCurrentSessionFiles() && (
+                message.toLowerCase().includes('analysis') ||
+                message.toLowerCase().includes('findings') ||
+                message.toLowerCase().includes('validation') ||
+                message.toLowerCase().includes('results') ||
+                message.toLowerCase().includes('match') ||
+                message.toLowerCase().includes('percentage')
+            )) {
+                addChatMessage('Please upload a configuration file first before I can provide analysis. I need to see your actual data to give you meaningful insights.', 'ai');
+                input.value = '';
+                return;
+            }
+            
+            // Add user message
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                const hasFiles = hasCurrentSessionFiles();
+                console.log('Sending chat request with hasFiles:', hasFiles);
+                
+                // Add session ID to headers if available
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (currentSessionId) {
+                    headers['X-Session-ID'] = currentSessionId;
+                }
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        message: message,
+                        hasFiles: hasFiles
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('Chat response:', result);
+                
+                if (result.response) {
+                    addChatMessage(result.response, 'ai');
+                } else if (result.error) {
+                    addChatMessage(`Error: ${result.error}`, 'ai');
+                } else {
+                    addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+                }
+            } catch (error) {
+                console.error('Chat error:', error);
+                addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+            }
+            
+            hideTypingIndicator();
+        }
+
+        // Check for existing session on page load
+        function checkExistingSession() {
+            const savedSessionId = localStorage.getItem('current_session_id');
+            const savedConsent = localStorage.getItem('gdpr_consent');
+            
+            if (savedConsent === 'true') {
+                gdprConsentGiven = true;
+                document.getElementById('gdpr-consent-banner').style.display = 'none';
+            }
+            
+            if (savedSessionId) {
+                currentSessionId = savedSessionId;
+                document.getElementById('session-info').style.display = 'block';
+                document.getElementById('session-id-display').textContent = currentSessionId;
+                console.log('✅ Restored existing session:', currentSessionId);
+            }
+        }
+
+        // Call session check on page load
+        checkExistingSession();
     </script>
 </body>
 </html>

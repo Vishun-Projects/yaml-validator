@@ -8,6 +8,8 @@ import tempfile
 import io
 import base64
 import requests
+import uuid
+import time
 
 # Import your existing modules
 import sys
@@ -15,6 +17,14 @@ import os
 
 # Add the parent directory to path to import ai_audit_gui
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+# Import GDPR database
+try:
+    from gdpr_database import get_gdpr_db
+    GDPR_DB_AVAILABLE = True
+except ImportError:
+    print("Warning: GDPR database not available. Running without database persistence.")
+    GDPR_DB_AVAILABLE = False
 
 # Import configuration
 try:
@@ -72,7 +82,9 @@ def ask_groq(prompt, system_prompt="You are an expert IT security analyst. Provi
         
         print(f"Calling Groq API with {len(prompt)} characters, max_tokens={max_tokens}, temperature={temperature}")
         
+        start_time = time.time()
         response = requests.post(GROQ_URL, headers=headers, json=payload, timeout=TIMEOUT)
+        response_time = time.time() - start_time
         
         if response.status_code != 200:
             raise Exception(f"Groq API error: HTTP {response.status_code}: {response.text}")
@@ -85,7 +97,7 @@ def ask_groq(prompt, system_prompt="You are an expert IT security analyst. Provi
             content = message.get("content", "")
             if content:
                 print(f"Groq API response: {len(content)} characters")
-                return content.strip()
+                return content.strip(), response_time, len(prompt), len(content)
         
         raise Exception("No response content from Groq API")
         
@@ -95,8 +107,46 @@ def ask_groq(prompt, system_prompt="You are an expert IT security analyst. Provi
 
 app = Flask(__name__)
 
-# Global storage for session data
+# Global storage for session data (fallback when database is not available)
 session_data = {}
+
+# Initialize GDPR database if available
+if GDPR_DB_AVAILABLE:
+    try:
+        gdpr_db = get_gdpr_db(echo=False)
+        print("✅ GDPR database initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize GDPR database: {e}")
+        GDPR_DB_AVAILABLE = False
+
+def get_or_create_session_id():
+    """Get or create a session ID for the current request"""
+    # Try to get from request headers or create new
+    session_id = request.headers.get('X-Session-ID')
+    if not session_id:
+        session_id = str(uuid.uuid4())
+    
+    # Only create database session if it doesn't already exist
+    if GDPR_DB_AVAILABLE:
+        try:
+            # Check if session already exists in database
+            existing_session = gdpr_db.get_session(session_id)
+            if not existing_session:
+                # Session doesn't exist, create it
+                user_agent = request.headers.get('User-Agent')
+                ip_address = request.remote_addr
+                gdpr_db.create_session(session_id, user_agent, ip_address)
+                print(f"✅ Created new database session: {session_id}")
+            else:
+                print(f"✅ Using existing database session: {session_id}")
+        except Exception as e:
+            # If it's a duplicate entry error, just log it and continue
+            if "Duplicate entry" in str(e):
+                print(f"✅ Session already exists (duplicate entry caught): {session_id}")
+            else:
+                print(f"Warning: Failed to check/create database session: {e}")
+    
+    return session_id
 
 @app.route('/')
 def serve_custom_ui():
@@ -122,10 +172,22 @@ def upload_file():
         if not file:
             return jsonify({'error': 'No file provided'}), 400
         
+        # Get or create session ID
+        session_id = get_or_create_session_id()
+        
         # Store file data
         file_content = file.read()
         file_name = file.filename
         
+        # Save to database if available
+        if GDPR_DB_AVAILABLE:
+            try:
+                gdpr_db.save_file(session_id, file_type, file_content, file_name, file.content_type)
+                print(f"✅ File saved to database: {file_name}")
+            except Exception as e:
+                print(f"Warning: Failed to save file to database: {e}")
+        
+        # Store in session data as fallback
         if file_type == 'config':
             # Handle config file - use the same logic as Streamlit app
             try:
@@ -136,10 +198,31 @@ def upload_file():
                     import io
                     df = pd.read_excel(io.BytesIO(file_content), sheet_name=0, dtype=str, engine="openpyxl")
                     config_data = {}
+                    
+                    # Process each row and handle comma-separated values
                     for _, row in df.iterrows():
                         if row.notnull().any():
-                            config_data = {str(k): (None if pd.isna(v) else v) for k, v in row.to_dict().items()}
-                            break
+                            row_data = {}
+                            for k, v in row.to_dict().items():
+                                if pd.notna(v) and v:
+                                    # Handle comma-separated values by splitting them
+                                    if ',' in str(v):
+                                        # Split by comma and create separate entries
+                                        values = [val.strip() for val in str(v).split(',') if val.strip()]
+                                        for i, val in enumerate(values):
+                                            if i == 0:
+                                                # First value gets the original key
+                                                row_data[str(k)] = val
+                                            else:
+                                                # Additional values get numbered keys
+                                                row_data[f"{k}_{i+1}"] = val
+                                    else:
+                                        row_data[str(k)] = v
+                            
+                            if row_data:
+                                config_data.update(row_data)
+                                break  # Use first non-empty row
+                    
                     config_yaml = yaml.safe_dump(config_data, sort_keys=False)
                 else:
                     # For other formats, try to decode as text
@@ -176,7 +259,11 @@ def upload_file():
                 'mime_type': file.content_type
             }
         
-        return jsonify({'success': True, 'filename': file_name})
+        return jsonify({
+            'success': True, 
+            'filename': file_name,
+            'session_id': session_id
+        })
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -185,6 +272,9 @@ def upload_file():
 def run_validation():
     try:
         print("Validation request received")
+        
+        # Get or create session ID
+        session_id = get_or_create_session_id()
         
         if 'config' not in session_data:
             print("No config file in session")
@@ -202,7 +292,7 @@ def run_validation():
             # Auto-generate snapshot like Streamlit app
             print("Generating auto-snapshot...")
             try:
-                snapshot = ai_audit_gui.collect_full_snapshot(interactive_ui=False, collect_apps_flag=False)
+                snapshot = ai_audit_gui.collect_full_snapshot(interactive_ui=True, collect_apps_flag=False)
                 print(f"Auto-snapshot generated with {len(snapshot) if snapshot else 0} keys")
             except Exception as e:
                 print(f"Failed to generate snapshot: {str(e)}")
@@ -221,9 +311,18 @@ def run_validation():
         session_data['validation_result'] = result
         print("Validation result stored in session")
         
+        # Save to database if available
+        if GDPR_DB_AVAILABLE:
+            try:
+                gdpr_db.save_validation_results(session_id, result)
+                print(f"✅ Validation results saved to database for session: {session_id}")
+            except Exception as e:
+                print(f"Warning: Failed to save validation results to database: {e}")
+        
         return jsonify({
             'success': True,
-            'result': result
+            'result': result,
+            'session_id': session_id
         })
         
     except Exception as e:
@@ -239,11 +338,28 @@ def chat():
         if not message:
             return jsonify({'error': 'No message provided'}), 400
         
+        # Get or create session ID
+        session_id = get_or_create_session_id()
+        
+        # Save user message to database if available
+        if GDPR_DB_AVAILABLE:
+            try:
+                gdpr_db.save_chat_message(session_id, 'user', message)
+            except Exception as e:
+                print(f"Warning: Failed to save user message to database: {e}")
+        
         # Check if we have validation results
         if 'validation_result' not in session_data:
-            return jsonify({
-                'response': 'Please run a validation first to analyze results. Upload a configuration file and click "Run Validation" to get started.'
-            })
+            response = 'Please run a validation first to analyze results. Upload a configuration file and click "Run Validation" to get started.'
+            
+            # Save AI response to database if available
+            if GDPR_DB_AVAILABLE:
+                try:
+                    gdpr_db.save_chat_message(session_id, 'ai', response, 'fallback')
+                except Exception as e:
+                    print(f"Warning: Failed to save AI response to database: {e}")
+            
+            return jsonify({'response': response})
         
         # Get validation results for context
         result = session_data['validation_result']
@@ -294,12 +410,22 @@ Be specific, technical, and actionable. Use the validation data to give precise 
         
         try:
             # Use real Groq API for intelligent responses
-            ai_response = ask_groq(
+            ai_response, response_time, prompt_tokens, response_tokens = ask_groq(
                 prompt=user_prompt,
                 system_prompt=system_prompt,
                 max_tokens=MAX_TOKENS,
                 temperature=TEMPERATURE
             )
+            
+            # Save AI response to database if available
+            if GDPR_DB_AVAILABLE:
+                try:
+                    gdpr_db.save_chat_message(
+                        session_id, 'ai', ai_response, 'groq', 
+                        prompt_tokens, response_tokens, response_time
+                    )
+                except Exception as e:
+                    print(f"Warning: Failed to save AI response to database: {e}")
             
             return jsonify({'response': ai_response})
             
@@ -307,6 +433,14 @@ Be specific, technical, and actionable. Use the validation data to give precise 
             print(f"Groq API error in chat: {str(e)}")
             # Provide fallback response based on validation data
             fallback_response = generate_intelligent_fallback(message, result, details, match_pct)
+            
+            # Save fallback response to database if available
+            if GDPR_DB_AVAILABLE:
+                try:
+                    gdpr_db.save_chat_message(session_id, 'ai', fallback_response, 'fallback')
+                except Exception as e:
+                    print(f"Warning: Failed to save fallback response to database: {e}")
+            
             return jsonify({'response': fallback_response})
         
     except Exception as e:
@@ -375,10 +509,23 @@ def export_data():
         data = request.get_json()
         export_type = data.get('format')
         
+        # Get or create session ID
+        session_id = get_or_create_session_id()
+        
         if 'validation_result' not in session_data:
             return jsonify({'error': 'No validation results to export'}), 400
         
         result = session_data['validation_result']
+        
+        # Log export action to database if available
+        if GDPR_DB_AVAILABLE:
+            try:
+                gdpr_db._log_audit_action(session_id, "export", {
+                    "export_type": export_type,
+                    "export_timestamp": datetime.utcnow().isoformat()
+                })
+            except Exception as e:
+                print(f"Warning: Failed to log export action to database: {e}")
         
         if export_type == 'json':
             # Return JSON data
@@ -457,21 +604,83 @@ def get_system_snapshot():
     try:
         print("Generating system snapshot...")
         
+        # Get or create session ID
+        session_id = get_or_create_session_id()
+        
         # Generate snapshot using the same logic as Streamlit app
-        snapshot = ai_audit_gui.collect_full_snapshot(interactive_ui=False, collect_apps_flag=False)
+        snapshot = ai_audit_gui.collect_full_snapshot(interactive_ui=True, collect_apps_flag=False)
         
         print(f"Snapshot generated with {len(snapshot) if snapshot else 0} keys")
         
         # Store in session for later use
         session_data['auto_snapshot'] = snapshot
         
+        # Save snapshot to database if available
+        if GDPR_DB_AVAILABLE:
+            try:
+                gdpr_db.save_file(session_id, 'snapshot', json.dumps(snapshot), 'system_snapshot.json', 'application/json')
+                print(f"✅ System snapshot saved to database for session: {session_id}")
+            except Exception as e:
+                print(f"Warning: Failed to save snapshot to database: {e}")
+        
         return jsonify({
             'success': True,
-            'snapshot': snapshot
+            'snapshot': snapshot,
+            'session_id': session_id
         })
         
     except Exception as e:
         print(f"Snapshot generation error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/gdpr/export/<session_id>', methods=['GET'])
+def export_gdpr_data(session_id):
+    """Export all data for a session in GDPR-compliant format"""
+    if not GDPR_DB_AVAILABLE:
+        return jsonify({'error': 'GDPR database not available'}), 503
+    
+    try:
+        gdpr_export = gdpr_db.export_gdpr_data(session_id)
+        if gdpr_export:
+            return jsonify(gdpr_export)
+        else:
+            return jsonify({'error': 'Session not found'}), 404
+    except Exception as e:
+        print(f"GDPR export error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/gdpr/cleanup', methods=['POST'])
+def cleanup_expired_data():
+    """Clean up expired data for GDPR compliance"""
+    if not GDPR_DB_AVAILABLE:
+        return jsonify({'error': 'GDPR database not available'}), 503
+    
+    try:
+        cleaned_count = gdpr_db.cleanup_expired_data()
+        return jsonify({
+            'success': True,
+            'cleaned_sessions': cleaned_count,
+            'message': f'Cleaned up {cleaned_count} expired sessions'
+        })
+    except Exception as e:
+        print(f"GDPR cleanup error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/gdpr/sessions', methods=['GET'])
+def list_sessions():
+    """List all validation sessions"""
+    if not GDPR_DB_AVAILABLE:
+        return jsonify({'error': 'GDPR database not available'}), 503
+    
+    try:
+        # This would need to be implemented in the GDPR database class
+        # For now, return a placeholder
+        return jsonify({
+            'message': 'Session listing not yet implemented',
+            'note': 'Use /api/gdpr/export/<session_id> to export specific session data'
+        })
+    except Exception as e:
+        print(f"Session listing error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
@@ -479,6 +688,7 @@ if __name__ == '__main__':
     print(f"Server will run on: http://{FLASK_HOST}:{FLASK_PORT}")
     print(f"Groq API configured: {'Yes' if GROQ_API_KEY and GROQ_API_KEY != 'gsk_your_actual_api_key_here' else 'No (using default)'}")
     print(f"AI Chat: {'Enabled' if GROQ_API_KEY and GROQ_API_KEY != 'gsk_your_actual_api_key_here' else 'Disabled - please set GROQ_API_KEY'}")
+    print(f"GDPR Database: {'Enabled' if GDPR_DB_AVAILABLE else 'Disabled'}")
     print("Open your browser and go to the URL above")
     
     app.run(debug=FLASK_DEBUG, host=FLASK_HOST, port=FLASK_PORT)

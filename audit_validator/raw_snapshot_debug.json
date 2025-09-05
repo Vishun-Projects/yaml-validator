@@ -1,0 +1,596 @@
+{
+  "WindowsBuildLabEx": "19041.1.amd64fre.vb_release.191206-1406",
+  "WindowsCurrentVersion": "6.3",
+  "WindowsEditionId": "Professional",
+  "WindowsInstallationType": "Client",
+  "WindowsInstallDateFromRegistry": "/Date(1745455201000)/",
+  "WindowsProductId": "00330-80000-00000-AA874",
+  "WindowsProductName": "Windows 10 Pro",
+  "WindowsRegisteredOrganization": "",
+  "WindowsRegisteredOwner": "admin",
+  "WindowsSystemRoot": "C:\\Windows",
+  "WindowsVersion": "2009",
+  "BiosCharacteristics": [
+    7,
+    9,
+    11,
+    12,
+    15,
+    16,
+    19,
+    26,
+    27,
+    28,
+    29,
+    32,
+    33,
+    40,
+    41,
+    42,
+    43
+  ],
+  "BiosBIOSVersion": [
+    "HPQOEM - 1072009",
+    "K01 v02.83",
+    "American Megatrends - 4028D"
+  ],
+  "BiosBuildNumber": null,
+  "BiosCaption": "K01 v02.83",
+  "BiosCodeSet": null,
+  "BiosCurrentLanguage": "en|US|iso8859-1",
+  "BiosDescription": "K01 v02.83",
+  "BiosEmbeddedControllerMajorVersion": 255,
+  "BiosEmbeddedControllerMinorVersion": 255,
+  "BiosFirmwareType": 2,
+  "BiosIdentificationCode": null,
+  "BiosInstallableLanguages": 12,
+  "BiosInstallDate": null,
+  "BiosLanguageEdition": null,
+  "BiosListOfLanguages": [
+    "en|US|iso8859-1",
+    "fr|FR|iso8859-1",
+    "es|ES|iso8859-1",
+    "de|DE|iso8859-1",
+    "it|IT|iso8859-1",
+    "da|DK|iso8859-1",
+    "fi|FI|iso8859-1",
+    "nl|NL|iso8859-1",
+    "no|NO|iso8859-1",
+    "pt|PT|iso8859-1",
+    "sv|SE|iso8859-1",
+    "ja|JP|unicode"
+  ],
+  "BiosManufacturer": "Hewlett-Packard",
+  "BiosName": "K01 v02.83",
+  "BiosOtherTargetOS": null,
+  "BiosPrimaryBIOS": true,
+  "BiosReleaseDate": "/Date(1351468800000)/",
+  "BiosSeralNumber": "2UA3160S36",
+  "BiosSMBIOSBIOSVersion": "K01 v02.83",
+  "BiosSMBIOSMajorVersion": 2,
+  "BiosSMBIOSMinorVersion": 7,
+  "BiosSMBIOSPresent": true,
+  "BiosSoftwareElementState": 3,
+  "BiosStatus": "OK",
+  "BiosSystemBiosMajorVersion": 2,
+  "BiosSystemBiosMinorVersion": 83,
+  "BiosTargetOperatingSystem": 0,
+  "BiosVersion": "HPQOEM - 1072009",
+  "CsAdminPasswordStatus": 0,
+  "CsAutomaticManagedPagefile": true,
+  "CsAutomaticResetBootOption": true,
+  "CsAutomaticResetCapability": true,
+  "CsBootOptionOnLimit": null,
+  "CsBootOptionOnWatchDog": null,
+  "CsBootROMSupported": true,
+  "CsBootStatus": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "CsBootupState": "Normal boot",
+  "CsCaption": "DT-143",
+  "CsChassisBootupState": 3,
+  "CsChassisSKUNumber": null,
+  "CsCurrentTimeZone": 330,
+  "CsDaylightInEffect": null,
+  "CsDescription": "AT/AT COMPATIBLE",
+  "CsDNSHostName": "DT-143",
+  "CsDomain": "WPSGP.LOCAL",
+  "CsDomainRole": 1,
+  "CsEnableDaylightSavingsTime": true,
+  "CsFrontPanelResetStatus": 0,
+  "CsHypervisorPresent": true,
+  "CsInfraredSupported": false,
+  "CsInitialLoadInfo": null,
+  "CsInstallDate": null,
+  "CsKeyboardPasswordStatus": 0,
+  "CsLastLoadInfo": null,
+  "CsManufacturer": "Hewlett-Packard",
+  "CsModel": "HP Compaq Elite 8300 SFF",
+  "CsName": "DT-143",
+  "CsNetworkAdapters": [
+    {
+      "Description": "Intel(R) 82579LM Gigabit Network Connection",
+      "ConnectionID": "Ethernet",
+      "DHCPEnabled": true,
+      "DHCPServer": "192.168.0.5",
+      "ConnectionStatus": 2,
+      "IPAddresses": [
+        "192.168.0.224",
+        "fe80::df85:5dc2:6245:3346"
+      ]
+    },
+    {
+      "Description": "VirtualBox Host-Only Ethernet Adapter",
+      "ConnectionID": "Ethernet 2",
+      "DHCPEnabled": false,
+      "DHCPServer": null,
+      "ConnectionStatus": 2,
+      "IPAddresses": [
+        "192.168.56.1",
+        "fe80::3284:3f70:2cc4:f0ca"
+      ]
+    }
+  ],
+  "CsNetworkServerModeEnabled": true,
+  "CsNumberOfLogicalProcessors": 8,
+  "CsNumberOfProcessors": 1,
+  "CsProcessors": [
+    {
+      "Name": "Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz",
+      "Manufacturer": "GenuineIntel",
+      "Description": "Intel64 Family 6 Model 58 Stepping 9",
+      "Architecture": 9,
+      "AddressWidth": 64,
+      "DataWidth": 64,
+      "MaxClockSpeed": 3401,
+      "CurrentClockSpeed": 3401,
+      "NumberOfCores": 4,
+      "NumberOfLogicalProcessors": 8,
+      "ProcessorID": "BFEBFBFF000306A9",
+      "SocketDesignation": "Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz",
+      "ProcessorType": 3,
+      "Role": "CPU",
+      "Status": "OK",
+      "CpuStatus": 1,
+      "Availability": 3
+    }
+  ],
+  "CsOEMStringArray": [
+    "ABS 70/71 60 61 62 63;",
+    "FBYTE#2U2V3E3Q3V3X47676J6S6b7B7H7M7Q7T7W7a7m8D9H9zagapaq.5E;",
+    "BUILDID#12WWIDFW605#SABA#DABA;"
+  ],
+  "CsPartOfDomain": true,
+  "CsPauseAfterReset": -1,
+  "CsPCSystemType": 1,
+  "CsPCSystemTypeEx": 1,
+  "CsPowerManagementCapabilities": null,
+  "CsPowerManagementSupported": null,
+  "CsPowerOnPasswordStatus": 0,
+  "CsPowerState": 0,
+  "CsPowerSupplyState": 3,
+  "CsPrimaryOwnerContact": null,
+  "CsPrimaryOwnerName": "admin",
+  "CsResetCapability": 1,
+  "CsResetCount": -1,
+  "CsResetLimit": -1,
+  "CsRoles": [
+    "LM_Workstation",
+    "LM_Server",
+    "NT"
+  ],
+  "CsStatus": "OK",
+  "CsSupportContactDescription": null,
+  "CsSystemFamily": "103C_53307F G=D",
+  "CsSystemSKUNumber": "D8C25UT#ABA",
+  "CsSystemType": "x64-based PC",
+  "CsThermalState": 3,
+  "CsTotalPhysicalMemory": 17121689600,
+  "CsPhyicallyInstalledMemory": 16777216,
+  "CsUserName": "WPSGP\\vishnu.vishwakarma",
+  "CsWakeUpType": 6,
+  "CsWorkgroup": null,
+  "OsName": "Microsoft Windows 10 Pro",
+  "OsType": 18,
+  "OsOperatingSystemSKU": 48,
+  "OsVersion": "10.0.19045",
+  "OsCSDVersion": null,
+  "OsBuildNumber": "19045",
+  "OsHotFixes": [
+    {
+      "HotFixID": "KB5056578",
+      "Description": "Update",
+      "InstalledOn": "4/24/2025",
+      "FixComments": ""
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB4589212",
+      "InstalledOn": "1/11/2023"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5007401",
+      "InstalledOn": "1/11/2023"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5011048",
+      "InstalledOn": "1/11/2023"
+    },
+    {
+      "Description": "Security Update",
+      "FixComments": "",
+      "HotFixID": "KB5012170",
+      "InstalledOn": "1/11/2023"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5015684",
+      "InstalledOn": "1/11/2023"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5020683",
+      "InstalledOn": "4/24/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5026037",
+      "InstalledOn": "4/24/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5033052",
+      "InstalledOn": "4/24/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5063842",
+      "InstalledOn": "8/28/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5020372",
+      "InstalledOn": "1/11/2023"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5054682",
+      "InstalledOn": "4/24/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5055663",
+      "InstalledOn": "4/24/2025"
+    },
+    {
+      "Description": "Security Update",
+      "FixComments": "",
+      "HotFixID": "KB5058526",
+      "InstalledOn": "5/15/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5059504",
+      "InstalledOn": "5/29/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5061902",
+      "InstalledOn": "6/25/2025"
+    },
+    {
+      "Description": "Security Update",
+      "FixComments": "",
+      "HotFixID": "KB5063706",
+      "InstalledOn": "7/9/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5063261",
+      "InstalledOn": "7/23/2025"
+    },
+    {
+      "Description": "Update",
+      "FixComments": "",
+      "HotFixID": "KB5063979",
+      "InstalledOn": "8/28/2025"
+    }
+  ],
+  "OsBootDevice": "\\Device\\HarddiskVolume3",
+  "OsSystemDevice": "\\Device\\HarddiskVolume5",
+  "OsSystemDirectory": "C:\\Windows\\system32",
+  "OsSystemDrive": "C:",
+  "OsWindowsDirectory": "C:\\Windows",
+  "OsCountryCode": "1",
+  "OsCurrentTimeZone": 330,
+  "OsLocaleID": "0409",
+  "OsLocale": "en-US",
+  "OsLocalDateTime": "/Date(1756965312180)/",
+  "OsLastBootUpTime": "/Date(1756963992500)/",
+  "OsUptime": {
+    "Ticks": 13196061998,
+    "Days": 0,
+    "Hours": 0,
+    "Milliseconds": 606,
+    "Minutes": 21,
+    "Seconds": 59,
+    "TotalDays": 0.015273219905092592,
+    "TotalHours": 0.3665572777222222,
+    "TotalMilliseconds": 1319606.1998,
+    "TotalMinutes": 21.993436663333334,
+    "TotalSeconds": 1319.6061998
+  },
+  "OsBuildType": "Multiprocessor Free",
+  "OsCodeSet": "1252",
+  "OsDataExecutionPreventionAvailable": true,
+  "OsDataExecutionPrevention32BitApplications": true,
+  "OsDataExecutionPreventionDrivers": true,
+  "OsDataExecutionPreventionSupportPolicy": 2,
+  "OsDebug": false,
+  "OsDistributed": false,
+  "OsEncryptionLevel": 256,
+  "OsForegroundApplicationBoost": 2,
+  "OsTotalVisibleMemorySize": 16720400,
+  "OsFreePhysicalMemory": 4873056,
+  "OsTotalVirtualMemorySize": 31924752,
+  "OsFreeVirtualMemory": 14556852,
+  "OsInUseVirtualMemory": 17367900,
+  "OsTotalSwapSpaceSize": null,
+  "OsSizeStoredInPagingFiles": 15204352,
+  "OsFreeSpaceInPagingFiles": 14963408,
+  "OsPagingFiles": [
+    "C:\\pagefile.sys"
+  ],
+  "OsHardwareAbstractionLayer": "10.0.19041.5553",
+  "OsInstallDate": "/Date(1745475001000)/",
+  "OsManufacturer": "Microsoft Corporation",
+  "OsMaxNumberOfProcesses": 4294967295,
+  "OsMaxProcessMemorySize": 137438953344,
+  "OsMuiLanguages": [
+    "en-US",
+    "ja-JP"
+  ],
+  "OsNumberOfLicensedUsers": null,
+  "OsNumberOfProcesses": 316,
+  "OsNumberOfUsers": 7,
+  "OsOrganization": "",
+  "OsArchitecture": "64-bit",
+  "OsLanguage": "en-US",
+  "OsProductSuites": [
+    256
+  ],
+  "OsOtherTypeDescription": null,
+  "OsPAEEnabled": null,
+  "OsPortableOperatingSystem": false,
+  "OsPrimary": true,
+  "OsProductType": 1,
+  "OsRegisteredUser": "admin",
+  "OsSerialNumber": "00330-80000-00000-AA874",
+  "OsServicePackMajorVersion": 0,
+  "OsServicePackMinorVersion": 0,
+  "OsStatus": "OK",
+  "OsSuites": [
+    16,
+    256
+  ],
+  "OsServerLevel": null,
+  "KeyboardLayout": "ja-JP",
+  "TimeZone": "(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi",
+  "LogonServer": "\\\\WP-DC1",
+  "PowerPlatformRole": 1,
+  "HyperVisorPresent": true,
+  "HyperVRequirementDataExecutionPreventionAvailable": null,
+  "HyperVRequirementSecondLevelAddressTranslation": null,
+  "HyperVRequirementVirtualizationFirmwareEnabled": null,
+  "HyperVRequirementVMMonitorModeExtensions": null,
+  "DeviceGuardSmartStatus": 0,
+  "DeviceGuardRequiredSecurityProperties": [
+    0
+  ],
+  "DeviceGuardAvailableSecurityProperties": [
+    1,
+    3
+  ],
+  "DeviceGuardSecurityServicesConfigured": [
+    0
+  ],
+  "DeviceGuardSecurityServicesRunning": [
+    0
+  ],
+  "DeviceGuardCodeIntegrityPolicyEnforcementStatus": 2,
+  "DeviceGuardUserModeCodeIntegrityPolicyEnforcementStatus": 0,
+  "ui": {
+    "language_preferences": {
+      "CurrentUICulture": {
+        "NativeName": "English (United States)",
+        "Name": "en-US",
+        "LCID": 1033,
+        "DisplayName": "English (United States)"
+      },
+      "UILanguageOverride": null,
+      "SystemLocale": {
+        "Parent": {
+          "Parent": "",
+          "LCID": 9,
+          "KeyboardLayoutId": 9,
+          "Name": "en",
+          "IetfLanguageTag": "en",
+          "DisplayName": "English",
+          "NativeName": "English",
+          "EnglishName": "English",
+          "TwoLetterISOLanguageName": "en",
+          "ThreeLetterISOLanguageName": "eng",
+          "ThreeLetterWindowsLanguageName": "ENU",
+          "CompareInfo": "CompareInfo - en",
+          "TextInfo": "TextInfo - en",
+          "IsNeutralCulture": true,
+          "CultureTypes": 69,
+          "NumberFormat": "System.Globalization.NumberFormatInfo",
+          "DateTimeFormat": "System.Globalization.DateTimeFormatInfo",
+          "Calendar": "System.Globalization.GregorianCalendar",
+          "OptionalCalendars": "System.Globalization.GregorianCalendar System.Globalization.GregorianCalendar",
+          "UseUserOverride": true,
+          "IsReadOnly": false
+        },
+        "LCID": 1033,
+        "KeyboardLayoutId": 1033,
+        "Name": "en-US",
+        "IetfLanguageTag": "en-US",
+        "DisplayName": "English (United States)",
+        "NativeName": "English (United States)",
+        "EnglishName": "English (United States)",
+        "TwoLetterISOLanguageName": "en",
+        "ThreeLetterISOLanguageName": "eng",
+        "ThreeLetterWindowsLanguageName": "ENU",
+        "CompareInfo": {
+          "Name": "en-US",
+          "LCID": 1033,
+          "Version": "System.Globalization.SortVersion"
+        },
+        "TextInfo": {
+          "ANSICodePage": 1252,
+          "OEMCodePage": 437,
+          "MacCodePage": 10000,
+          "EBCDICCodePage": 37,
+          "LCID": 1033,
+          "CultureName": "en-US",
+          "IsReadOnly": false,
+          "ListSeparator": ",",
+          "IsRightToLeft": false
+        },
+        "IsNeutralCulture": false,
+        "CultureTypes": 70,
+        "NumberFormat": {
+          "CurrencyDecimalDigits": 2,
+          "CurrencyDecimalSeparator": ".",
+          "IsReadOnly": false,
+          "CurrencyGroupSizes": "3",
+          "NumberGroupSizes": "3",
+          "PercentGroupSizes": "3",
+          "CurrencyGroupSeparator": ",",
+          "CurrencySymbol": "$",
+          "NaNSymbol": "NaN",
+          "CurrencyNegativePattern": 0,
+          "NumberNegativePattern": 1,
+          "PercentPositivePattern": 1,
+          "PercentNegativePattern": 1,
+          "NegativeInfinitySymbol": "-",
+          "NegativeSign": "-",
+          "NumberDecimalDigits": 2,
+          "NumberDecimalSeparator": ".",
+          "NumberGroupSeparator": ",",
+          "CurrencyPositivePattern": 0,
+          "PositiveInfinitySymbol": "",
+          "PositiveSign": "+",
+          "PercentDecimalDigits": 2,
+          "PercentDecimalSeparator": ".",
+          "PercentGroupSeparator": ",",
+          "PercentSymbol": "%",
+          "PerMilleSymbol": "%",
+          "NativeDigits": "0 1 2 3 4 5 6 7 8 9",
+          "DigitSubstitution": 1
+        },
+        "DateTimeFormat": {
+          "AMDesignator": "AM",
+          "Calendar": "System.Globalization.GregorianCalendar",
+          "DateSeparator": "/",
+          "FirstDayOfWeek": 0,
+          "CalendarWeekRule": 0,
+          "FullDateTimePattern": "dddd, MMMM d, yyyy h:mm:ss tt",
+          "LongDatePattern": "dddd, MMMM d, yyyy",
+          "LongTimePattern": "h:mm:ss tt",
+          "MonthDayPattern": "MMMM d",
+          "PMDesignator": "PM",
+          "RFC1123Pattern": "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
+          "ShortDatePattern": "M/d/yyyy",
+          "ShortTimePattern": "h:mm tt",
+          "SortableDateTimePattern": "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
+          "TimeSeparator": ":",
+          "UniversalSortableDateTimePattern": "yyyy'-'MM'-'dd HH':'mm':'ss'Z'",
+          "YearMonthPattern": "MMMM yyyy",
+          "AbbreviatedDayNames": "Sun Mon Tue Wed Thu Fri Sat",
+          "ShortestDayNames": "Su Mo Tu We Th Fr Sa",
+          "DayNames": "Sunday Monday Tuesday Wednesday Thursday Friday Saturday",
+          "AbbreviatedMonthNames": "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec ",
+          "MonthNames": "January February March April May June July August September October November December ",
+          "IsReadOnly": false,
+          "NativeCalendarName": "Gregorian Calendar",
+          "AbbreviatedMonthGenitiveNames": "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec ",
+          "MonthGenitiveNames": "January February March April May June July August September October November December "
+        },
+        "Calendar": {
+          "MinSupportedDateTime": "/Date(-62135596800000)/",
+          "MaxSupportedDateTime": "/Date(253402280999999)/",
+          "AlgorithmType": 1,
+          "CalendarType": 1,
+          "Eras": "1",
+          "TwoDigitYearMax": 2049,
+          "IsReadOnly": false
+        },
+        "OptionalCalendars": [
+          "System.Globalization.GregorianCalendar",
+          "System.Globalization.GregorianCalendar"
+        ],
+        "UseUserOverride": true,
+        "IsReadOnly": false
+      },
+      "CurrentCulture": {
+        "NativeName": "??? (??)",
+        "Name": "ja-JP",
+        "LCID": 1041,
+        "DisplayName": "Japanese (Japan)"
+      }
+    },
+    "displays": {
+      "Screens": [
+        {
+          "Width": 1920,
+          "Primary": true,
+          "DeviceName": "\\\\.\\DISPLAY1",
+          "Height": 1080
+        }
+      ]
+    },
+    "keyboard_layout": {
+      "WinUserLanguageList": [
+        {
+          "LanguageTag": "ja",
+          "LocalizedName": "Japanese",
+          "Autonym": "???"
+        },
+        {
+          "LanguageTag": "en-US",
+          "LocalizedName": "English (United States)",
+          "Autonym": "English (United States)"
+        }
+      ],
+      "Registry": "00000411",
+      "DefaultInputMethod": null
+    }
+  }
+}
